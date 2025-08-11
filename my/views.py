@@ -34,6 +34,10 @@ def web_development_view(request):
     return render(request, "full_stack_projects.html", {"projects": projects})
 
 
+def thankyou(request):
+    return render(request,"thankyou.html")
+
+
 
 
 def contact_us(request):
@@ -46,7 +50,7 @@ def contact_us(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, message=message,phone=phone)
 
-        return redirect('/')  # You can make a success page or redirect back
+        return redirect('thankyou')  # You can make a success page or redirect back
 
     return render(request, 'index.html')
 
@@ -61,7 +65,7 @@ def contact_us_web_develpoment(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, message=message,phone=phone)
 
-        return redirect('web_development')  # You can make a success page or redirect back
+        return redirect('thankyou')  # You can make a success page or redirect back
 
     return render(request, 'full_stack_projects.html')
 
@@ -75,7 +79,7 @@ def contact_us_AIML(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, message=message,phone=phone)
 
-        return redirect('AI_ML')  # You can make a success page or redirect back
+        return redirect('thankyou')  # You can make a success page or redirect back
 
     return render(request, 'AI_ML.html')
 
@@ -89,7 +93,7 @@ def contact_us_datascience(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, message=message,phone=phone)
 
-        return redirect('DATA-SCIENCE')  # You can make a success page or redirect back
+        return redirect('thankyou')  # You can make a success page or redirect back
 
     return render(request, 'DATA-SCIENCE.html')
 
@@ -104,7 +108,7 @@ def contact_us_python(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, message=message,phone=phone)
 
-        return redirect('pythonprojects')  # You can make a success page or redirect back
+        return redirect('thankyou')  # You can make a success page or redirect back
 
     return render(request, 'pythonprojects.html')
 

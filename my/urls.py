@@ -12,13 +12,16 @@ urlpatterns = [
     
     path("web_development_view/",views.web_development_view,name="web_development_view"),
     
+    
+    
     #contact_us
-    
-    
     path("contact_us_web_develpoment/",views.contact_us_web_develpoment,name="contact_us_web_develpoment"),
     path("contact_us_AIML/",views.contact_us_AIML,name="contact_us_AIML"),
     path("contact_us_datascience/",views.contact_us_datascience,name="contact_us_datascience"),
     path("contact_us_pythonproject/",views.contact_us_python,name="contact_us_pythonproject"),
     
+    
+    #thankyou
+    path('thankyou/',views.thankyou,name='thankyou')
     
 ]
