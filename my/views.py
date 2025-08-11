@@ -17,7 +17,7 @@ def web_development(request):
 
 def AI_ML(request):
     projects = models.AI_ML.objects.all()  
-    return render(request, "AI-ML.HTML", {"projects": projects})
+    return render(request, "AI_ML.HTML", {"projects": projects})
     
 
 def data_science(request):
