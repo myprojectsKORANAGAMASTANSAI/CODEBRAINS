@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%#^-c5tdccl%f!g32+4v=&(h)q!9_s8d&dnz3qcuvqmwb*we8s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['codebrains.onrender.com','localhost','127.0.0.1']
 
 
 # Application definition
@@ -136,4 +136,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'  # URL to access media files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media') 
 
-INTERNAL_IPS='127.0.0.1'
