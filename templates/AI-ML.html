@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Brains - Mini and Major Projects</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide-js@0.365.0"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100">
+
+    <!-- Header & Navigation -->
+    <header class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo with SVG -->
+            <a href="/" class="flex items-center space-x-2 text-yellow-400 font-extrabold rounded-lg p-2 transition-transform transform hover:scale-105">
+
+<img src="https://i.ibb.co/p6mX6CnZ/Picsart-25-08-11-11-18-31-009.png" alt="Picsart-25-08-11-11-18-31-009" class="h-10 w-auto">
+            <span class="text-3xl">CODE BRAINS</span>
+            </a>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="/" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300">Home</a>
+                <a href="#projects" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300">Projects</a>
+                <a href="#about" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300">About</a>
+                <a href="#contact" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300">Contact</a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 rounded-md p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu">
+                    <line x1="4" x2="20" y1="12" y2="12" />
+                    <line x1="4" x2="20" y1="6" y2="6" />
+                    <line x1="4" x2="20" y1="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 shadow-lg absolute top-full left-0 w-full">
+            <nav class="flex flex-col items-center py-4 space-y-4">
+                <a href="#home" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300 w-full text-center py-2 border-b border-gray-700">Home</a>
+                <a href="#projects" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300 w-full text-center py-2 border-b border-gray-700">Projects</a>
+                <a href="#about" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300 w-full text-center py-2 border-b border-gray-700">About</a>
+                <a href="#contact" class="text-gray-300 hover:text-yellow-400 font-semibold transition-colors duration-300 w-full text-center py-2">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+<section id="projects" class="py-20 bg-gray-900">
+    <div class="container mx-auto px-6">
+        <h2 class="text-4xl md:text-5xl font-bold text-center text-white mb-12">
+            Artificial Intelligence and Machine Learning
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+            {% for project in projects %}
+                <a href="{% url 'web_development_view' %}" class="group">
+                    <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl">
+                        <img src="{{ project.photo.url }}" alt="{{ project.title }}" class="w-full h-56 object-cover">
+                        <div class="p-6">
+                            <h3 class="text-2xl font-bold text-white mb-2 transition-colors duration-300 group-hover:text-yellow-400">
+                                {{ project.title }}
+                            </h3>
+                            <p class="text-gray-300 transition-colors duration-300 group-hover:text-yellow-400">
+                                {{ project.content }}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+ <!-- About Section -->
+        <section id="about" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <h2 class="text-4xl md:text-5xl font-bold text-center text-white mb-12">About CODE BRAINS</h2>
+                <div class="text-lg text-gray-300 space-y-6">
+                    <p>
+                        CODE BRAINS is dedicated to providing high-quality solutions for a wide range of programming and development needs. We focus on helping students and professionals with their mini and major projects, ensuring they are completed with excellence.
+                    </p>
+                    <p>
+                        Our expertise includes **Python, C, C++, and SQL**, as well as specialized fields like **Full Stack Development, Data Analytics, Data Science, and Artificial Intelligence & Machine Learning**. We also offer services for project implementation and error fixing to ensure your projects are flawless.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <h2 class="text-4xl md:text-5xl font-bold text-center text-white mb-12">Contact Us</h2>
+                <div class="bg-gray-800 p-8 rounded-xl shadow-lg">
+                    <form class="space-y-6" method="POST" action="{% url 'contact_us_AIML' %}">
+                        {% csrf_token %}
+                        <div>
+                            <label for="name" class="block text-gray-300 font-medium mb-2">Name</label>
+                            <input type="text" id="name" name="name" class="w-full p-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-100 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-colors duration-300" placeholder="Your Name">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-gray-300 font-medium mb-2">Email</label>
+                            <input type="email" id="email" name="email" class="w-full p-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-100 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-colors duration-300" placeholder="you@example.com">
+                        </div>
+                         <div>
+                            <label for="phone" class="block text-gray-300 font-medium mb-2">Phone</label>
+                            <input type="text" id="phone" name="phone" class="w-full p-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-100 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-colors duration-300" placeholder="Phone Number">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-gray-300 font-medium mb-2">Message</label>
+                            <textarea id="message" name="message" rows="5" class="w-full p-3 rounded-lg border-2 border-gray-700 bg-gray-900 text-gray-100 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400 transition-colors duration-300" placeholder="Your message..."></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-500 transition-transform transform hover:scale-105">
+                            Send Message
+                        </button>
+                    </form>
+                    <div class="mt-8 text-center text-gray-300">
+                        <p>You can also reach out directly to Mastan:</p>
+                        <p>Email: <a href="mailto:info@codebrains.com" class="text-yellow-400 hover:underline">codebrains503@gmail.com</a></p>
+                        <p>Phone: <a href="tel:+919347106608" class="text-yellow-400 hover:underline">+91 9347106608</a></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 CODE BRAINS. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+
+
+</body>
+</html>
