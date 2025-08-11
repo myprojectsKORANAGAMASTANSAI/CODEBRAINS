@@ -75,9 +75,9 @@ def contact_us_AIML(request):
         # Save to DB
         ContactMessage.objects.create(name=name, email=email, message=message,phone=phone)
 
-        return redirect('AI-ML')  # You can make a success page or redirect back
+        return redirect('AI_ML')  # You can make a success page or redirect back
 
-    return render(request, 'AI-ML.html')
+    return render(request, 'AI_ML.html')
 
 def contact_us_datascience(request):
     if request.method == "POST":
