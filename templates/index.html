@@ -85,65 +85,96 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
 
       <!-- Project Card 1: Full Stack Development -->
-      <a href="{% url 'web_development' %}" class="group">
+      <a href="{% url 'web_development' %}" class="group block relative">
         <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl">
-          <img src="https://placehold.co/800x600/374151/FFFFFF?text=Full+Stack+Development" alt="Full Stack Development" class="w-full h-56 object-cover">
-          <div class="p-6">
+          <img src="https://placehold.co/800x600/374151/FFFFFF?text=  Web+Development" alt="Full Stack Development" class="w-full h-56 object-cover">
+          <div class="p-6 relative">
             <h3 class="text-2xl font-bold text-white mb-2 transition-colors duration-300 group-hover:text-yellow-400">
-              Full Stack Development
+              Web Development
             </h3>
             <p class="text-gray-300 transition-colors duration-300 group-hover:text-yellow-400">
               Building dynamic and responsive web applications from front to back-end, using modern technologies.
               
             </p>
+            <!-- Arrow button -->
+            <div class="absolute bottom-4 right-4">
+              <button class="bg-yellow-400 text-gray-900 p-3 rounded-full shadow-lg hover:bg-yellow-500 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              <pre></pre>
+            </div>
           </div>
         </div>
+        
       </a>
 
       <!-- Project Card 2: AI & Machine Learning -->
-      <a href="{% url 'AI_ML' %}" class="group">
+      <a href="{% url 'AI_ML' %}" class="group block relative">
         <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl">
           <img src="https://placehold.co/800x600/4b5563/FFFFFF?text=AI+and+ML" alt="AI and Machine Learning" class="w-full h-56 object-cover">
-          <div class="p-6">
+          <div class="p-6 relative">
             <h3 class="text-2xl font-bold text-white mb-2 transition-colors duration-300 group-hover:text-yellow-400">
               AI & Machine Learning
             </h3>
             <p class="text-gray-300 transition-colors duration-300 group-hover:text-yellow-400">
               Developing intelligent systems and models for data analysis, prediction, and automation.
-              <pre> </pre>
             </p>
+            <!-- Arrow button -->
+            <div class="absolute bottom-4 right-4">
+              <button class="bg-yellow-400 text-gray-900 p-3 rounded-full shadow-lg hover:bg-yellow-500 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </a>
 
       <!-- Project Card 3: Data Analytics -->
-      <a href="{% url 'DATA-SCIENCE' %}" class="group">
+      <a href="{% url 'DATA-SCIENCE' %}" class="group block relative">
         <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl">
           <img src="https://placehold.co/800x600/6b7280/FFFFFF?text=Data+Analytics" alt="Data Analytics & Data Science" class="w-full h-56 object-cover">
-          <div class="p-6">
+          <div class="p-6 relative">
             <h3 class="text-2xl font-bold text-white mb-2 transition-colors duration-300 group-hover:text-yellow-400">
               Data Analytics & Science
             </h3>
             <p class="text-gray-300 transition-colors duration-300 group-hover:text-yellow-400">
               Turning raw data into valuable insights and actionable strategies for your business.
-              <pre>
-              </pre>
             </p>
+            <!-- Arrow button -->
+            <div class="absolute bottom-4 right-4">
+              <button class="bg-yellow-400 text-gray-900 p-3 rounded-full shadow-lg hover:bg-yellow-500 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </a>
 
-      <a href="{% url 'pythonprojects' %}" class="group">
+      <!-- Project Card 4: Python Projects -->
+      <a href="{% url 'pythonprojects' %}" class="group block relative">
         <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-2xl">
-          <img src="https://placehold.co/800x600/4b5563/FFFFFF?text=Python+Projects" alt="AI and Machine Learning" class="w-full h-56 object-cover">
-          <div class="p-6">
+          <img src="https://placehold.co/800x600/4b5563/FFFFFF?text=Python+Projects" alt="Python Projects" class="w-full h-56 object-cover">
+          <div class="p-6 relative">
             <h3 class="text-2xl font-bold text-white mb-2 transition-colors duration-300 group-hover:text-yellow-400">
               Python Projects
             </h3>
             <p class="text-gray-300 transition-colors duration-300 group-hover:text-yellow-400">
               Developing intelligent systems and models for data analysis, prediction, and automation.
-              <pre> </pre>
             </p>
+            <!-- Arrow button -->
+            <div class="absolute bottom-4 right-4">
+              <button class="bg-yellow-400 text-gray-900 p-3 rounded-full shadow-lg hover:bg-yellow-500 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </a>
@@ -151,6 +182,7 @@
     </div>
   </div>
 </section>
+
 
 
         <!-- About Section -->
