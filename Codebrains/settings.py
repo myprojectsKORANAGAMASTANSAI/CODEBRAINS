@@ -81,9 +81,12 @@ WSGI_APPLICATION = 'Codebrains.wsgi.application'
 
 DATABASES = {
      'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',  # Path to SQLite file
-    }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': 'PZyJyYzqzrtSNHfFkdcjEIFJkeRKwyrN',
+        'HOST': 'shortline.proxy.rlwy.net',  # or your DB server IP
+        'PORT': '37085',}
     
 }
 
