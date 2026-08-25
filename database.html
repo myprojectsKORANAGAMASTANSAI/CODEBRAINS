@@ -4,24 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODE BRAINS — Private File & Folder Database</title>
-    <meta name="description" content="Personal and private file and folder database management for CODE BRAINS projects, source code, reports, PPTs, datasets, and IEEE papers.">
+    <title>CODE BRAINS — Private Cloud & File Database</title>
+    <meta name="description" content="Personal and private online cloud file and folder database management for CODE BRAINS projects, source code, reports, PPTs, datasets, and IEEE papers.">
     <link rel="icon" type="image/png" href="static/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/css/style.css">
     <style>
         .db-layout {
-            padding: 100px 0 60px;
+            padding: 90px 0 60px;
             min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, rgba(250, 204, 21, 0.05) 0%, transparent 60%);
         }
 
         /* ── AUTH LOCK SCREEN ── */
         .auth-overlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.98));
-            backdrop-filter: blur(20px);
+            background: radial-gradient(circle at 50% 30%, rgba(31, 41, 55, 0.96), rgba(13, 17, 23, 0.99));
+            backdrop-filter: blur(24px);
             z-index: 3000;
             display: flex;
             align-items: center;
@@ -37,7 +38,7 @@
             width: 100%;
             max-width: 440px;
             text-align: center;
-            box-shadow: var(--shadow-glow), 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            box-shadow: var(--shadow-glow), 0 25px 50px -12px rgba(0, 0, 0, 0.8);
             animation: authPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -47,20 +48,21 @@
         }
 
         .auth-logo {
-            height: 64px;
+            height: 68px;
             width: auto;
             margin: 0 auto 16px;
-            filter: drop-shadow(0 0 20px rgba(250, 204, 21, 0.3));
+            filter: drop-shadow(0 0 20px rgba(250, 204, 21, 0.35));
         }
 
         .auth-title {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
             font-weight: 800;
             margin-bottom: 6px;
+            letter-spacing: -0.5px;
         }
 
         .auth-subtitle {
-            font-size: 0.85rem;
+            font-size: 0.86rem;
             color: var(--text-secondary);
             margin-bottom: 28px;
             line-height: 1.5;
@@ -74,7 +76,7 @@
         .auth-input-group label {
             display: block;
             font-size: 0.78rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-secondary);
             margin-bottom: 6px;
             text-transform: uppercase;
@@ -111,7 +113,7 @@
         .auth-input:focus {
             border-color: var(--accent-1);
             box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
-            background: rgba(17, 24, 39, 0.9);
+            background: rgba(17, 24, 39, 0.95);
         }
 
         .auth-pwd-toggle {
@@ -151,21 +153,25 @@
 
         .auth-btn {
             width: 100%;
-            padding: 13px;
+            padding: 14px;
             border-radius: 50px;
             background: var(--gradient-1);
             color: #111827;
-            font-weight: 700;
-            font-size: 0.95rem;
+            font-weight: 800;
+            font-size: 0.96rem;
             border: none;
             cursor: pointer;
             transition: var(--transition);
             margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .auth-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(250, 204, 21, 0.35);
+            box-shadow: 0 10px 25px rgba(250, 204, 21, 0.4);
         }
 
         .auth-back-link {
@@ -185,7 +191,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             flex-wrap: wrap;
             gap: 16px;
         }
@@ -196,6 +202,14 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .db-header-badges {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .db-user-badge {
@@ -211,6 +225,33 @@
             border: 1px solid rgba(250, 204, 21, 0.25);
         }
 
+        .db-cloud-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(16, 185, 129, 0.12);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .db-cloud-badge.syncing {
+            background: rgba(250, 204, 21, 0.12);
+            color: var(--accent-1);
+            border-color: rgba(250, 204, 21, 0.25);
+        }
+
+        .db-cloud-badge.offline {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.25);
+        }
+
         .db-logout-btn {
             background: rgba(239, 68, 68, 0.12);
             border: 1px solid rgba(239, 68, 68, 0.25);
@@ -221,7 +262,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
-            margin-left: 10px;
         }
 
         .db-logout-btn:hover {
@@ -229,17 +269,18 @@
             color: #ffffff;
         }
 
+        /* Stats Bar */
         .db-stats-bar {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 16px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .db-stat-box {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            padding: 18px 24px;
+            padding: 16px 20px;
             border-radius: var(--radius-md);
             display: flex;
             align-items: center;
@@ -250,27 +291,32 @@
         .db-stat-box:hover {
             border-color: var(--accent-1);
             transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
         .db-stat-icon {
             font-size: 2rem;
+            padding: 10px;
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.03);
         }
 
         .db-stat-info span {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .db-stat-info strong {
-            font-size: 1.4rem;
+            font-size: 1.35rem;
             font-weight: 800;
             color: var(--accent-1);
         }
 
+        /* Main Container Card */
         .db-container-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
@@ -279,9 +325,10 @@
             box-shadow: var(--shadow-card);
         }
 
+        /* Toolbar */
         .db-toolbar {
-            padding: 20px 24px;
-            background: rgba(255, 255, 255, 0.02);
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.015);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
@@ -293,7 +340,7 @@
         .db-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
@@ -303,10 +350,10 @@
             gap: 8px;
             padding: 9px 18px;
             border-radius: 50px;
-            font-size: 0.85rem;
+            font-size: 0.84rem;
             font-weight: 600;
             cursor: pointer;
-            border: 1px solid transparent;
+            border: 1px solid var(--border);
             transition: var(--transition);
             background: rgba(255, 255, 255, 0.05);
             color: var(--text-primary);
@@ -315,22 +362,48 @@
         .db-btn:hover {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--accent-1);
+            transform: translateY(-1px);
         }
 
         .db-btn-primary {
             background: var(--gradient-1);
             color: #111827;
-            font-weight: 700;
+            font-weight: 800;
+            border: none;
         }
 
         .db-btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(250, 204, 21, 0.3);
+            box-shadow: 0 6px 20px rgba(250, 204, 21, 0.35);
+        }
+
+        .db-btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            font-weight: 700;
+            border: none;
+        }
+
+        .db-btn-success:hover {
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+            transform: translateY(-2px);
+        }
+
+        .db-btn-cloud {
+            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            color: #ffffff;
+            font-weight: 700;
+            border: none;
+        }
+
+        .db-btn-cloud:hover {
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
+            transform: translateY(-2px);
         }
 
         .db-search-box {
             position: relative;
-            min-width: 260px;
+            min-width: 280px;
         }
 
         .db-search-input {
@@ -348,6 +421,7 @@
         .db-search-input:focus {
             border-color: var(--accent-1);
             box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.15);
+            background: rgba(0, 0, 0, 0.3);
         }
 
         .db-search-icon {
@@ -360,19 +434,29 @@
             pointer-events: none;
         }
 
+        /* Filter Chips Bar */
         .db-filter-chips {
             display: flex;
-            gap: 8px;
-            padding: 12px 24px;
-            background: rgba(0, 0, 0, 0.15);
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            background: rgba(0, 0, 0, 0.2);
             border-bottom: 1px solid var(--border);
             overflow-x: auto;
+            gap: 12px;
+        }
+
+        .db-chips-group {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
         }
 
         .db-chip {
             padding: 5px 14px;
             border-radius: 50px;
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             font-weight: 600;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
@@ -389,38 +473,178 @@
             color: var(--accent-1);
         }
 
+        .db-view-options {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .db-view-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: var(--transition);
+        }
+
+        .db-view-btn.active, .db-view-btn:hover {
+            background: rgba(250, 204, 21, 0.15);
+            color: var(--accent-1);
+            border-color: var(--accent-1);
+        }
+
+        /* Breadcrumbs Bar */
+        .db-breadcrumbs-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 24px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.015);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
         .db-breadcrumbs {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 14px 24px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            border-bottom: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.01);
+            flex-wrap: wrap;
         }
 
         .db-breadcrumb-link {
             color: var(--accent-1);
             cursor: pointer;
             font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: var(--transition);
         }
 
         .db-breadcrumb-link:hover {
             text-decoration: underline;
+            color: #ffffff;
         }
 
+        .db-breadcrumb-separator {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .db-breadcrumb-current {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        /* ── ACTIVE FOLDER HEADER BANNER ── */
+        .db-folder-banner {
+            margin: 20px 24px 10px;
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.08) 0%, rgba(31, 41, 55, 0.6) 100%);
+            border: 1px solid rgba(250, 204, 21, 0.25);
+            border-radius: var(--radius-lg);
+            padding: 18px 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .db-folder-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .db-folder-badge-icon {
+            font-size: 2.2rem;
+            background: rgba(250, 204, 21, 0.15);
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+
+        .db-folder-title h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .db-folder-category-pill {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 50px;
+            background: rgba(250, 204, 21, 0.2);
+            color: var(--accent-1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .db-folder-meta-text {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .db-folder-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ── Content Area ── */
         .db-content-area {
             padding: 24px;
-            min-height: 400px;
+            min-height: 440px;
         }
 
+        /* Drag and Drop Zone */
+        .db-dropzone {
+            border: 2px dashed rgba(250, 204, 21, 0.35);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+            background: rgba(250, 204, 21, 0.02);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .db-dropzone:hover,
+        .db-dropzone.dragover {
+            border-color: var(--accent-1);
+            background: rgba(250, 204, 21, 0.08);
+            transform: scale(1.005);
+        }
+
+        /* Grid View */
         .db-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
             gap: 16px;
         }
 
+        /* List View */
+        .db-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* ── Folder & File Cards ── */
         .db-item-card {
             position: relative;
             padding: 16px;
@@ -432,13 +656,23 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            min-height: 140px;
         }
 
         .db-item-card:hover {
             border-color: var(--accent-1);
             transform: translateY(-3px);
-            box-shadow: var(--shadow-card);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             background: var(--bg-card-hover);
+        }
+
+        .db-item-card.is-folder {
+            border-left: 3px solid var(--accent-1);
+            background: linear-gradient(135deg, rgba(250, 204, 21, 0.03) 0%, var(--bg-card) 100%);
+        }
+
+        .db-item-card.is-folder:hover {
+            border-left-color: #f59e0b;
         }
 
         .db-item-top {
@@ -448,32 +682,74 @@
             margin-bottom: 12px;
         }
 
+        .db-item-icon-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .db-item-icon {
             font-size: 2.2rem;
+            line-height: 1;
         }
 
-        .db-item-menu-btn {
-            background: none;
-            border: none;
+        .db-item-card-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .db-item-action-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid transparent;
             color: var(--text-muted);
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             cursor: pointer;
-            padding: 4px;
-            border-radius: 4px;
+            padding: 5px 7px;
+            border-radius: 6px;
+            transition: var(--transition);
         }
 
-        .db-item-menu-btn:hover {
+        .db-item-action-btn:hover {
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--border-hover);
+        }
+
+        .db-item-action-btn.delete-btn:hover {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
         }
 
         .db-item-name {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 0.92rem;
+            font-weight: 700;
             color: var(--text-primary);
             word-break: break-word;
             line-height: 1.4;
             margin-bottom: 6px;
+        }
+
+        .db-item-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .db-item-badge {
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-secondary);
+        }
+
+        .db-item-badge.badge-folder {
+            background: rgba(250, 204, 21, 0.15);
+            color: var(--accent-1);
+            font-weight: 700;
         }
 
         .db-item-meta {
@@ -482,45 +758,67 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 10px;
+            margin-top: auto;
             padding-top: 8px;
-            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        /* List View Row Styles */
+        .db-list .db-item-card {
+            flex-direction: row;
+            align-items: center;
+            min-height: auto;
+            padding: 12px 18px;
+            gap: 16px;
+        }
+
+        .db-list .db-item-top {
+            margin-bottom: 0;
+        }
+
+        .db-list .db-item-name {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .db-list .db-item-meta {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+            gap: 20px;
+        }
+
+        /* ── Empty State ── */
         .db-empty-state {
             text-align: center;
             padding: 60px 20px;
             color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.15);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-lg);
+            margin: 10px 0;
         }
 
         .db-empty-icon {
             font-size: 3.5rem;
-            margin-bottom: 12px;
-            opacity: 0.5;
+            margin-bottom: 14px;
+            opacity: 0.6;
         }
 
-        /* Drag and Drop Zone */
-        .db-dropzone {
-            border: 2px dashed rgba(250, 204, 21, 0.3);
-            border-radius: var(--radius-lg);
-            padding: 30px;
-            text-align: center;
-            margin-bottom: 24px;
-            background: rgba(250, 204, 21, 0.02);
-            transition: var(--transition);
-            cursor: pointer;
+        .db-empty-actions {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
 
-        .db-dropzone.dragover {
-            border-color: var(--accent-1);
-            background: rgba(250, 204, 21, 0.08);
-        }
-
-        /* Modal Styles */
+        /* ── MODALS ── */
         .db-modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(8px);
             z-index: 2000;
             display: none;
@@ -535,21 +833,21 @@
 
         .db-modal {
             background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-xl);
             width: 100%;
             max-width: 650px;
-            max-height: 85vh;
+            max-height: 88vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(250, 204, 21, 0.08);
             animation: modalFadeIn 0.25s ease;
         }
 
         @keyframes modalFadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .db-modal-header {
@@ -562,17 +860,22 @@
         }
 
         .db-modal-header h3 {
-            font-size: 1.15rem;
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-weight: 800;
             color: var(--accent-1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .db-modal-close {
             background: none;
             border: none;
             color: var(--text-muted);
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             cursor: pointer;
+            line-height: 1;
+            padding: 4px;
         }
 
         .db-modal-close:hover {
@@ -592,16 +895,22 @@
         .db-form-group label {
             display: block;
             font-size: 0.82rem;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-secondary);
             margin-bottom: 6px;
+        }
+
+        .db-form-hint {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
 
         .db-form-input,
         .db-form-select,
         .db-form-textarea {
             width: 100%;
-            padding: 10px 16px;
+            padding: 11px 16px;
             border-radius: var(--radius-sm);
             background: var(--bg-primary);
             border: 1px solid var(--border);
@@ -614,8 +923,9 @@
 
         .db-form-textarea {
             font-family: var(--font-mono);
-            min-height: 140px;
+            min-height: 180px;
             resize: vertical;
+            line-height: 1.5;
         }
 
         .db-form-input:focus,
@@ -623,6 +933,7 @@
         .db-form-textarea:focus {
             border-color: var(--accent-1);
             box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.15);
+            background: rgba(17, 24, 39, 0.95);
         }
 
         .db-modal-footer {
@@ -634,6 +945,39 @@
             gap: 12px;
         }
 
+        /* Upload Queue in Modal */
+        .upload-queue-list {
+            max-height: 160px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            margin-top: 12px;
+        }
+
+        .upload-queue-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.82rem;
+        }
+
+        .upload-queue-item:last-child {
+            border-bottom: none;
+        }
+
+        .upload-queue-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* Code Preview Box */
         .code-preview-box {
             background: #0d1117;
             border: 1px solid var(--border);
@@ -642,21 +986,90 @@
             font-family: var(--font-mono);
             font-size: 0.82rem;
             color: #E6EDF3;
-            max-height: 380px;
+            max-height: 420px;
             overflow: auto;
             white-space: pre-wrap;
             line-height: 1.6;
+        }
+
+        /* Image Preview Box */
+        .image-preview-box {
+            text-align: center;
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            max-height: 400px;
+            overflow: auto;
+        }
+
+        .image-preview-box img {
+            max-height: 350px;
+            margin: 0 auto;
+            border-radius: var(--radius-sm);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast-notification {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hover);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            font-size: 0.86rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+        }
+
+        .toast-notification.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast-notification.info {
+            border-left: 4px solid var(--accent-1);
+        }
+
+        .toast-notification.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(40px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
 
 <body>
 
+    <!-- ═══════════ TOAST NOTIFICATIONS ═══════════ -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- ═══════════ AUTHENTICATION LOCK OVERLAY ═══════════ -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-card">
             <img src="static/images/logo.png" alt="Code Brains" class="auth-logo">
-            <h2 class="auth-title">🔐 Private Database</h2>
+            <h2 class="auth-title">🔐 Private Cloud Database</h2>
             <p class="auth-subtitle">Authorized Access Only. Please enter your administrator credentials to proceed.</p>
 
             <div class="auth-error" id="authError">
@@ -720,12 +1133,15 @@
             
             <div class="db-header">
                 <div class="db-title-area">
-                    <h1>🗄️ Project & Files Database</h1>
+                    <h1>🗄️ Online Cloud Database</h1>
                     <p style="color: var(--text-secondary); margin-top: 4px; font-size: 0.95rem;">
-                        Private storage for your Python source codes, presentations, reports, IEEE papers, and datasets.
+                        Real-time cloud database storage. Create folders, upload files, and persistently delete across all devices.
                     </p>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="db-header-badges">
+                    <span class="db-cloud-badge" id="cloudStatusBadge" title="Click to open Cloud Database settings">
+                        <span id="cloudStatusDot">🟢</span> <span id="cloudStatusText">Online Cloud Connected</span>
+                    </span>
                     <span class="db-user-badge">👤 mastan (Admin)</span>
                     <button class="db-logout-btn" id="dbHeaderLogoutBtn">Logout</button>
                 </div>
@@ -737,28 +1153,28 @@
                     <span class="db-stat-icon">📁</span>
                     <div class="db-stat-info">
                         <span>Total Folders</span>
-                        <strong id="statFolders">8</strong>
+                        <strong id="statFolders">0</strong>
                     </div>
                 </div>
                 <div class="db-stat-box">
                     <span class="db-stat-icon">📄</span>
                     <div class="db-stat-info">
                         <span>Total Files</span>
-                        <strong id="statFiles">15</strong>
+                        <strong id="statFiles">0</strong>
                     </div>
                 </div>
                 <div class="db-stat-box">
-                    <span class="db-stat-icon">💾</span>
+                    <span class="db-stat-icon">☁️</span>
                     <div class="db-stat-info">
-                        <span>Storage Used</span>
-                        <strong id="statStorage">14.8 MB</strong>
+                        <span>Online Cloud DB</span>
+                        <strong style="color: #34d399;" id="statStorage">Connected & Live</strong>
                     </div>
                 </div>
                 <div class="db-stat-box">
                     <span class="db-stat-icon">⚡</span>
                     <div class="db-stat-info">
-                        <span>Database Status</span>
-                        <strong style="color: #43E97B;">Active & Protected</strong>
+                        <span>Realtime Sync</span>
+                        <strong style="color: var(--accent-1);" id="statSyncStatus">Active (Auto-Sync)</strong>
                     </div>
                 </div>
             </div>
@@ -766,22 +1182,28 @@
             <!-- File Explorer Card -->
             <div class="db-container-card">
                 
-                <!-- Toolbar -->
+                <!-- Main Action Toolbar -->
                 <div class="db-toolbar">
                     <div class="db-actions">
-                        <button class="db-btn db-btn-primary" id="btnNewFolder">
+                        <button class="db-btn db-btn-primary" id="btnNewFolder" title="Create a new folder in this location">
                             <span>📁</span> New Folder
                         </button>
-                        <button class="db-btn" id="btnUploadFile">
-                            <span>⬆️</span> Upload File
+                        <button class="db-btn db-btn-success" id="btnUploadFile" title="Upload files directly into this location">
+                            <span>📤</span> Upload Files
                         </button>
-                        <button class="db-btn" id="btnNewCode">
-                            <span>📝</span> Create Code File
+                        <button class="db-btn" id="btnNewCode" title="Create a new code or text file">
+                            <span>📝</span> New Code File
                         </button>
-                        <button class="db-btn" id="btnExportDb" title="Backup Database to JSON">
+                        <button class="db-btn db-btn-cloud" id="btnSyncCloud" title="Sync & Refresh latest changes from Online Cloud DB">
+                            <span>🔄</span> Sync Online DB
+                        </button>
+                        <button class="db-btn" id="btnCloudSettings" title="Configure Cloud Database Provider & Credentials">
+                            <span>⚙️</span> Cloud Settings
+                        </button>
+                        <button class="db-btn" id="btnExportDb" title="Backup Database to JSON file">
                             <span>📥</span> Backup DB
                         </button>
-                        <button class="db-btn" id="btnImportDb" title="Restore Database from JSON">
+                        <button class="db-btn" id="btnImportDb" title="Restore Database from JSON file">
                             <span>📤</span> Restore DB
                         </button>
                     </div>
@@ -792,20 +1214,68 @@
                     </div>
                 </div>
 
-                <!-- Category Chips -->
+                <!-- Category Chips & View Modes -->
                 <div class="db-filter-chips">
-                    <button class="db-chip active" data-filter="all">All Items</button>
-                    <button class="db-chip" data-filter="folder">📁 Folders</button>
-                    <button class="db-chip" data-filter="code">🐍 Python / Code</button>
-                    <button class="db-chip" data-filter="presentation">📊 PPT Presentations</button>
-                    <button class="db-chip" data-filter="report">📄 Reports & Docs</button>
-                    <button class="db-chip" data-filter="dataset">🗃️ Datasets</button>
-                    <button class="db-chip" data-filter="paper">📰 IEEE Papers</button>
+                    <div class="db-chips-group">
+                        <button class="db-chip active" data-filter="all">All Items</button>
+                        <button class="db-chip" data-filter="folder">📁 Folders</button>
+                        <button class="db-chip" data-filter="code">🐍 Python / Code</button>
+                        <button class="db-chip" data-filter="presentation">📊 PPT Presentations</button>
+                        <button class="db-chip" data-filter="report">📄 Reports & Docs</button>
+                        <button class="db-chip" data-filter="dataset">🗃️ Datasets</button>
+                        <button class="db-chip" data-filter="paper">📰 IEEE Papers</button>
+                        <button class="db-chip" data-filter="image">🖼️ Images</button>
+                    </div>
+
+                    <div class="db-view-options">
+                        <button class="db-view-btn active" id="viewModeGrid" title="Grid View">⊞ Grid</button>
+                        <button class="db-view-btn" id="viewModeList" title="List View">☰ List</button>
+                    </div>
                 </div>
 
                 <!-- Breadcrumbs -->
-                <div class="db-breadcrumbs" id="dbBreadcrumbs">
-                    <span class="db-breadcrumb-link" data-path="root">Root</span>
+                <div class="db-breadcrumbs-bar">
+                    <div class="db-breadcrumbs" id="dbBreadcrumbs">
+                        <span class="db-breadcrumb-link" onclick="navigateToFolder('root')">🏠 Root</span>
+                    </div>
+                    <div id="quickBackBtnContainer" style="display: none;">
+                        <button class="db-btn" style="padding: 4px 12px; font-size: 0.78rem;" id="btnBackToParent">
+                            <span>⬅️</span> Back to Parent
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Inside-Folder Banner (Displayed only when inside a subfolder) -->
+                <div class="db-folder-banner" id="dbFolderBanner" style="display: none;">
+                    <div class="db-folder-info">
+                        <div class="db-folder-badge-icon" id="bannerFolderIcon">📁</div>
+                        <div class="db-folder-title">
+                            <h2>
+                                <span id="bannerFolderName">Folder Name</span>
+                                <span class="db-folder-category-pill" id="bannerFolderCategory">General</span>
+                            </h2>
+                            <div class="db-folder-meta-text" id="bannerFolderStats">
+                                0 files • 0 subfolders
+                            </div>
+                        </div>
+                    </div>
+                    <div class="db-folder-banner-actions">
+                        <button class="db-btn db-btn-success" id="bannerUploadBtn">
+                            <span>📤</span> Upload Files Here
+                        </button>
+                        <button class="db-btn" id="bannerNewSubfolderBtn">
+                            <span>📁</span> New Subfolder
+                        </button>
+                        <button class="db-btn" id="bannerNewCodeBtn">
+                            <span>📝</span> Add Code
+                        </button>
+                        <button class="db-btn" id="bannerRenameBtn" title="Rename this folder">
+                            <span>✏️</span> Rename
+                        </button>
+                        <button class="db-btn db-item-action-btn delete-btn" id="bannerDeleteBtn" title="Delete this folder and all its files from Cloud DB" style="padding: 9px 14px; border-radius: 50px; font-weight: 600; font-size: 0.84rem;">
+                            <span>🗑️</span> Delete Folder
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Content Area -->
@@ -813,21 +1283,37 @@
                     
                     <!-- Drag and Drop Box -->
                     <div class="db-dropzone" id="dbDropzone">
-                        <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📤</span>
-                        <p style="font-weight: 600; color: var(--text-primary);">Drag and drop files here to store in this folder</p>
-                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Supports Python (.py, .ipynb), PPT (.pptx), PDF, DOCX, ZIP, CSV, Datasets</p>
+                        <span style="font-size: 2.2rem; display: block; margin-bottom: 6px;">📤</span>
+                        <p style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;" id="dropzoneLabel">
+                            Drag & drop files here to upload into current folder & sync to Online Cloud DB
+                        </p>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
+                            Supports Python (.py, .ipynb), PPT (.pptx), PDF, DOCX, ZIP, CSV, Datasets, Images (.png, .jpg)
+                        </p>
                         <input type="file" id="hiddenFileInput" multiple style="display: none;">
                     </div>
 
-                    <!-- Items Grid -->
+                    <!-- Items Grid / List -->
                     <div class="db-grid" id="dbItemsGrid">
-                        <!-- Populated by JavaScript -->
+                        <!-- Populated dynamically by JavaScript -->
                     </div>
 
+                    <!-- Empty State -->
                     <div class="db-empty-state" id="dbEmptyState" style="display: none;">
                         <div class="db-empty-icon">📭</div>
-                        <p style="font-weight: 600; font-size: 1.1rem; color: var(--text-primary);">This folder is empty</p>
-                        <p style="font-size: 0.85rem; margin-top: 6px;">Click "Upload File" or "New Folder" above to add items.</p>
+                        <p style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">This folder is currently empty</p>
+                        <p style="font-size: 0.85rem; margin-top: 6px;">Upload project files or create subfolders to sync with Cloud DB.</p>
+                        <div class="db-empty-actions">
+                            <button class="db-btn db-btn-success" id="emptyUploadBtn">
+                                <span>📤</span> Upload Files to this Folder
+                            </button>
+                            <button class="db-btn" id="emptyFolderBtn">
+                                <span>📁</span> Create Subfolder
+                            </button>
+                            <button class="db-btn" id="emptyCodeBtn">
+                                <span>📝</span> Create Code File
+                            </button>
+                        </div>
                     </div>
 
                 </div>
@@ -839,34 +1325,156 @@
 
     <!-- ═══════════ MODALS ═══════════ -->
 
+    <!-- Cloud Database Settings Modal -->
+    <div class="db-modal-overlay" id="cloudSettingsModal">
+        <div class="db-modal" style="max-width: 620px;">
+            <div class="db-modal-header">
+                <h3>☁️ Cloud Database Configuration</h3>
+                <button class="db-modal-close" data-close="cloudSettingsModal">&times;</button>
+            </div>
+            <div class="db-modal-body">
+                <div class="db-form-group">
+                    <label>Cloud Database Provider</label>
+                    <select id="cloudProviderSelect" class="db-form-select">
+                        <option value="firebase">🔥 Firebase Realtime Database (Recommended)</option>
+                        <option value="supabase">⚡ Supabase REST API</option>
+                        <option value="custom">🌐 Custom REST Cloud Endpoint / Webhook</option>
+                        <option value="builtin">☁️ Built-in Cloud Sync (Zero Setup)</option>
+                        <option value="local">🗄️ Local Storage Only (Offline Mode)</option>
+                    </select>
+                    <div class="db-form-hint">Choose your preferred online database backend for real-time storage & sync.</div>
+                </div>
+
+                <div class="db-form-group" id="cloudUrlGroup">
+                    <label id="cloudUrlLabel">Firebase Database URL / Endpoint</label>
+                    <input type="text" id="cloudUrlInput" class="db-form-input" placeholder="https://your-project-default-rtdb.firebaseio.com/">
+                    <div class="db-form-hint" id="cloudUrlHint">Enter your Firebase Realtime Database URL.</div>
+                </div>
+
+                <div class="db-form-group" id="cloudKeyGroup">
+                    <label id="cloudKeyLabel">API Key / Secret Token (Optional)</label>
+                    <input type="password" id="cloudKeyInput" class="db-form-input" placeholder="Enter auth key or secret (if protected)">
+                </div>
+
+                <div class="db-form-group">
+                    <label>Database Path / Namespace</label>
+                    <input type="text" id="cloudPathInput" class="db-form-input" value="codebrains_db">
+                    <div class="db-form-hint">The root node/table in your cloud database where files & folders are saved.</div>
+                </div>
+
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-sm); margin-top: 16px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary);">⚡ Connection Status:</span>
+                        <span id="cloudTestStatus" style="font-size: 0.82rem; font-weight: 700; color: #34d399;">Ready</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="db-btn" id="btnTestCloudConnection" style="padding: 6px 14px; font-size: 0.8rem;">
+                            🔌 Test Connection
+                        </button>
+                        <button type="button" class="db-btn" id="btnPushLocalToCloud" style="padding: 6px 14px; font-size: 0.8rem;">
+                            ⬆️ Push All Local Data to Cloud
+                        </button>
+                        <button type="button" class="db-btn" id="btnPullCloudToLocal" style="padding: 6px 14px; font-size: 0.8rem;">
+                            ⬇️ Pull Fresh Data from Cloud
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="db-modal-footer">
+                <button class="db-btn" data-close="cloudSettingsModal">Cancel</button>
+                <button class="db-btn db-btn-primary" id="btnSaveCloudSettings">Save Cloud Configuration</button>
+            </div>
+        </div>
+    </div>
+
     <!-- New Folder Modal -->
     <div class="db-modal-overlay" id="folderModal">
         <div class="db-modal">
             <div class="db-modal-header">
-                <h3>📁 Create New Folder</h3>
+                <h3>📁 <span id="folderModalTitle">Create New Folder</span></h3>
                 <button class="db-modal-close" data-close="folderModal">&times;</button>
             </div>
             <div class="db-modal-body">
                 <div class="db-form-group">
-                    <label>Folder Name</label>
-                    <input type="text" id="folderNameInput" class="db-form-input" placeholder="e.g. Computer_Vision_Models">
+                    <label>Target Location</label>
+                    <select id="folderParentSelect" class="db-form-select">
+                        <option value="root">🏠 Root (Main Directory)</option>
+                    </select>
+                    <div class="db-form-hint">Choose where this folder will be created.</div>
                 </div>
                 <div class="db-form-group">
-                    <label>Category Tag</label>
+                    <label>Folder Name</label>
+                    <input type="text" id="folderNameInput" class="db-form-input" placeholder="e.g. YOLOv8_Autonomous_Vehicles" autocomplete="off">
+                </div>
+                <div class="db-form-group">
+                    <label>Category / Domain Tag</label>
                     <select id="folderCategorySelect" class="db-form-select">
-                        <option value="General">General</option>
-                        <option value="Machine Learning">Machine Learning</option>
-                        <option value="Computer Vision">Computer Vision</option>
-                        <option value="Deep Learning">Deep Learning</option>
-                        <option value="NLP & Speech">NLP & Speech</option>
-                        <option value="Reports & PPT">Reports & PPT</option>
-                        <option value="IEEE Research">IEEE Research</option>
+                        <option value="General">📁 General</option>
+                        <option value="Machine Learning">🤖 Machine Learning</option>
+                        <option value="Computer Vision">👁️ Computer Vision</option>
+                        <option value="Deep Learning">🧠 Deep Learning & AI</option>
+                        <option value="NLP & Speech">🗣️ NLP & Speech</option>
+                        <option value="Reports & PPT">📊 Reports & PPT</option>
+                        <option value="IEEE Research">📰 IEEE Research</option>
+                        <option value="Web Apps">🌐 Web & Full Stack</option>
+                        <option value="Datasets">🗃️ Datasets</option>
                     </select>
                 </div>
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="folderModal">Cancel</button>
-                <button class="db-btn db-btn-primary" id="btnConfirmFolder">Create Folder</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmFolder">Create & Save Online</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Files Modal -->
+    <div class="db-modal-overlay" id="uploadModal">
+        <div class="db-modal" style="max-width: 680px;">
+            <div class="db-modal-header">
+                <h3>📤 Upload Files to Online Database</h3>
+                <button class="db-modal-close" data-close="uploadModal">&times;</button>
+            </div>
+            <div class="db-modal-body">
+                <div class="db-form-group">
+                    <label>Target Destination Folder</label>
+                    <select id="uploadFolderSelect" class="db-form-select">
+                        <option value="root">🏠 Root (Main Directory)</option>
+                    </select>
+                    <div class="db-form-hint">Files will be saved into the selected folder in Online Cloud DB.</div>
+                </div>
+
+                <div class="db-form-group">
+                    <label>Select or Drop Files</label>
+                    <div class="db-dropzone" id="modalDropzone" style="margin-bottom: 8px; padding: 20px;">
+                        <span style="font-size: 1.8rem; display: block; margin-bottom: 4px;">📂</span>
+                        <p style="font-weight: 700; font-size: 0.9rem;">Click or drag files here to select</p>
+                        <p style="font-size: 0.74rem; color: var(--text-muted);">Upload single or multiple files simultaneously</p>
+                        <input type="file" id="modalFileInput" multiple style="display: none;">
+                    </div>
+                </div>
+
+                <div class="db-form-group" id="stagedFilesContainer" style="display: none;">
+                    <label>Files to Upload (<span id="stagedFilesCount">0</span> selected)</label>
+                    <div class="upload-queue-list" id="uploadQueueList"></div>
+                </div>
+
+                <div class="db-form-group">
+                    <label>Category Classification (Optional)</label>
+                    <select id="uploadCategorySelect" class="db-form-select">
+                        <option value="auto">✨ Auto-Detect from File Extension</option>
+                        <option value="code">🐍 Python / Source Code</option>
+                        <option value="presentation">📊 PPT Presentation</option>
+                        <option value="report">📄 Project Report / Doc</option>
+                        <option value="paper">📰 IEEE Research Paper</option>
+                        <option value="dataset">🗃️ Dataset (CSV/JSON/SQL)</option>
+                        <option value="image">🖼️ Image / Asset</option>
+                    </select>
+                </div>
+            </div>
+            <div class="db-modal-footer">
+                <button class="db-btn" data-close="uploadModal">Cancel</button>
+                <button class="db-btn db-btn-success" id="btnConfirmUpload" disabled>Upload & Save Online</button>
             </div>
         </div>
     </div>
@@ -880,17 +1488,76 @@
             </div>
             <div class="db-modal-body">
                 <div class="db-form-group">
-                    <label>File Name (with extension)</label>
-                    <input type="text" id="codeFileNameInput" class="db-form-input" placeholder="e.g. pothole_detection_yolov8.py">
+                    <label>Save in Folder</label>
+                    <select id="codeFolderSelect" class="db-form-select">
+                        <option value="root">🏠 Root</option>
+                    </select>
                 </div>
                 <div class="db-form-group">
-                    <label>File Content</label>
+                    <label>File Name (with extension)</label>
+                    <input type="text" id="codeFileNameInput" class="db-form-input" placeholder="e.g. yolo_traffic_detector.py">
+                </div>
+                <div class="db-form-group">
+                    <label>Starter Template (Optional)</label>
+                    <select id="codeTemplateSelect" class="db-form-select">
+                        <option value="blank">Empty Blank File</option>
+                        <option value="yolo">Python YOLOv8 Object Detection Template</option>
+                        <option value="rf">Machine Learning Random Forest Classifier</option>
+                        <option value="opencv">OpenCV Video & Frame Processing</option>
+                        <option value="fastapi">FastAPI / Flask Model REST API</option>
+                    </select>
+                </div>
+                <div class="db-form-group">
+                    <label>Source Code Content</label>
                     <textarea id="codeFileContentInput" class="db-form-textarea" placeholder="# Enter Python or source code here..."></textarea>
                 </div>
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="codeModal">Cancel</button>
-                <button class="db-btn db-btn-primary" id="btnConfirmCode">Save File</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmCode">Save Online</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rename Item Modal -->
+    <div class="db-modal-overlay" id="renameModal">
+        <div class="db-modal" style="max-width: 480px;">
+            <div class="db-modal-header">
+                <h3>✏️ Rename Item</h3>
+                <button class="db-modal-close" data-close="renameModal">&times;</button>
+            </div>
+            <div class="db-modal-body">
+                <div class="db-form-group">
+                    <label>New Name</label>
+                    <input type="text" id="renameInput" class="db-form-input">
+                </div>
+            </div>
+            <div class="db-modal-footer">
+                <button class="db-btn" data-close="renameModal">Cancel</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmRename">Save & Sync Online</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Move Item Modal -->
+    <div class="db-modal-overlay" id="moveModal">
+        <div class="db-modal" style="max-width: 500px;">
+            <div class="db-modal-header">
+                <h3>🔀 Move to Folder</h3>
+                <button class="db-modal-close" data-close="moveModal">&times;</button>
+            </div>
+            <div class="db-modal-body">
+                <div class="db-form-group">
+                    <p style="font-size: 0.9rem; margin-bottom: 12px;">
+                        Move <strong id="moveItemName" style="color: var(--accent-1);">item</strong> to:
+                    </p>
+                    <label>Destination Folder</label>
+                    <select id="moveDestinationSelect" class="db-form-select"></select>
+                </div>
+            </div>
+            <div class="db-modal-footer">
+                <button class="db-btn" data-close="moveModal">Cancel</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmMove">Move & Sync Online</button>
             </div>
         </div>
     </div>
@@ -903,18 +1570,19 @@
                 <button class="db-modal-close" data-close="previewModal">&times;</button>
             </div>
             <div class="db-modal-body">
-                <div class="code-preview-box" id="previewContent">
-                    Loading content...
+                <div id="previewContainer">
+                    <div class="code-preview-box" id="previewContent">Loading content...</div>
                 </div>
             </div>
             <div class="db-modal-footer">
+                <button class="db-btn" id="btnCopyPreview">📋 Copy Text</button>
                 <button class="db-btn db-btn-primary" id="btnDownloadPreview">📥 Download File</button>
                 <button class="db-btn" data-close="previewModal">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- ═══════════ JAVASCRIPT AUTHENTICATION & DATABASE ENGINE ═══════════ -->
+    <!-- ═══════════ JAVASCRIPT AUTHENTICATION & CLOUD DATABASE ENGINE ═══════════ -->
     <script>
         // ── Security Credentials ──
         const AUTH_CONFIG = {
@@ -931,14 +1599,14 @@
         const authPassword = document.getElementById('authPassword');
         const authPwdToggle = document.getElementById('authPwdToggle');
 
-        // Toggle password visibility
+        // Password visibility toggle
         authPwdToggle.addEventListener('click', () => {
             const isPassword = authPassword.type === 'password';
             authPassword.type = isPassword ? 'text' : 'password';
             authPwdToggle.textContent = isPassword ? '🙈' : '👁️';
         });
 
-        // Check authentication state on page load
+        // Authentication state
         function checkAuth() {
             const savedSession = sessionStorage.getItem(AUTH_CONFIG.sessionKey) || localStorage.getItem(AUTH_CONFIG.sessionKey);
             if (savedSession === AUTH_CONFIG.validUser) {
@@ -952,7 +1620,7 @@
             authOverlay.style.display = 'none';
             dbMainSection.style.display = 'block';
             document.getElementById('navLogoutBtn').style.display = 'inline-block';
-            renderExplorer();
+            initDatabaseAndCloud();
         }
 
         function lockDashboard() {
@@ -962,7 +1630,6 @@
             authPassword.value = '';
         }
 
-        // Handle login form submission
         authForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const user = authUsername.value.trim();
@@ -973,36 +1640,263 @@
                 sessionStorage.setItem(AUTH_CONFIG.sessionKey, user);
                 localStorage.setItem(AUTH_CONFIG.sessionKey, user);
                 unlockDashboard();
+                showToast("Welcome back, Administrator!", "success");
             } else {
                 authError.style.display = 'block';
                 authError.classList.remove('shake');
-                void authError.offsetWidth; // Trigger reflow for animation
+                void authError.offsetWidth;
                 authError.classList.add('shake');
             }
         });
 
-        // Logout action
         function performLogout() {
             sessionStorage.removeItem(AUTH_CONFIG.sessionKey);
             localStorage.removeItem(AUTH_CONFIG.sessionKey);
             lockDashboard();
+            showToast("Logged out securely", "info");
         }
 
         document.getElementById('navLogoutBtn').addEventListener('click', performLogout);
         document.getElementById('dbHeaderLogoutBtn').addEventListener('click', performLogout);
 
-        // ── In-Memory & LocalStorage Database Initial State ──
-        const DB_STORAGE_KEY = 'codebrains_user_database_v1';
+        // ── Toast System ──
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(10px)';
+                toast.style.transition = '0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
 
-        const defaultDatabase = {
-            currentFolderId: 'root',
+        // ── Cloud Database Configuration & State ──
+        const CLOUD_CONFIG_KEY = 'codebrains_cloud_config_v2';
+        
+        let cloudConfig = {
+            provider: 'firebase', // 'firebase' | 'supabase' | 'custom' | 'builtin' | 'local'
+            url: 'https://code-brains-default-rtdb.firebaseio.com/',
+            key: '',
+            path: 'codebrains_db'
+        };
+
+        function loadCloudConfig() {
+            const saved = localStorage.getItem(CLOUD_CONFIG_KEY);
+            if (saved) {
+                try { cloudConfig = { ...cloudConfig, ...JSON.parse(saved) }; } catch (e) {}
+            }
+        }
+
+        function saveCloudConfig() {
+            localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloudConfig));
+        }
+        loadCloudConfig();
+
+        // ── Cloud Sync Engine ──
+        const CloudEngine = {
+            isSyncing: false,
+
+            setSyncState(state, message) {
+                const badge = document.getElementById('cloudStatusBadge');
+                const dot = document.getElementById('cloudStatusDot');
+                const text = document.getElementById('cloudStatusText');
+                const statSync = document.getElementById('statSyncStatus');
+                const statStorage = document.getElementById('statStorage');
+
+                if (state === 'syncing') {
+                    badge.className = 'db-cloud-badge syncing';
+                    dot.textContent = '🔄';
+                    text.textContent = message || 'Syncing with Cloud DB...';
+                    if (statSync) statSync.textContent = 'Syncing...';
+                } else if (state === 'connected') {
+                    badge.className = 'db-cloud-badge';
+                    dot.textContent = '🟢';
+                    text.textContent = message || 'Online Cloud Connected';
+                    if (statSync) statSync.textContent = 'Active (Live Sync)';
+                    if (statStorage) statStorage.textContent = 'Connected & Live';
+                } else if (state === 'offline') {
+                    badge.className = 'db-cloud-badge offline';
+                    dot.textContent = '🔴';
+                    text.textContent = message || 'Local Mode (Offline)';
+                    if (statSync) statSync.textContent = 'Local Only';
+                    if (statStorage) statStorage.textContent = 'Local Storage';
+                }
+            },
+
+            getEndpointUrl(subpath = '') {
+                if (cloudConfig.provider === 'local') return null;
+                let baseUrl = (cloudConfig.url || '').trim();
+                if (!baseUrl) return null;
+                if (!baseUrl.endsWith('/')) baseUrl += '/';
+                const namespace = cloudConfig.path || 'codebrains_db';
+
+                if (cloudConfig.provider === 'firebase' || cloudConfig.provider === 'builtin') {
+                    // Firebase REST API format: https://<project>.firebaseio.com/codebrains_db/<subpath>.json
+                    const pathPart = subpath ? `${namespace}/${subpath}` : namespace;
+                    let url = `${baseUrl}${pathPart}.json`;
+                    if (cloudConfig.key) url += `?auth=${encodeURIComponent(cloudConfig.key)}`;
+                    return url;
+                } else {
+                    return `${baseUrl}${namespace}${subpath ? '/' + subpath : ''}`;
+                }
+            },
+
+            // Fetch entire database from cloud
+            async fetchAll() {
+                const url = this.getEndpointUrl();
+                if (!url) return null;
+
+                try {
+                    this.setSyncState('syncing', 'Fetching from Cloud DB...');
+                    const headers = {};
+                    if (cloudConfig.provider === 'supabase' && cloudConfig.key) {
+                        headers['apikey'] = cloudConfig.key;
+                        headers['Authorization'] = `Bearer ${cloudConfig.key}`;
+                    }
+
+                    const res = await fetch(url, { method: 'GET', headers });
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    this.setSyncState('connected', 'Online Cloud Synced');
+                    return data;
+                } catch (err) {
+                    console.warn("Cloud DB fetch error:", err);
+                    this.setSyncState('offline', 'Cloud Offline / Local Cache');
+                    return null;
+                }
+            },
+
+            // Save or Update entire database state in cloud
+            async pushAll(dbObj) {
+                const url = this.getEndpointUrl();
+                if (!url) return false;
+
+                try {
+                    this.setSyncState('syncing', 'Saving to Cloud DB...');
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (cloudConfig.provider === 'supabase' && cloudConfig.key) {
+                        headers['apikey'] = cloudConfig.key;
+                        headers['Authorization'] = `Bearer ${cloudConfig.key}`;
+                    }
+
+                    // Format payload for Firebase (objects keyed by id or arrays)
+                    const payload = {
+                        folders: dbObj.folders,
+                        files: dbObj.files,
+                        lastUpdated: new Date().toISOString()
+                    };
+
+                    const res = await fetch(url, {
+                        method: 'PUT',
+                        headers,
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    this.setSyncState('connected', 'Saved to Cloud Database');
+                    return true;
+                } catch (err) {
+                    console.warn("Cloud DB push error:", err);
+                    this.setSyncState('offline', 'Cloud Sync Error');
+                    return false;
+                }
+            },
+
+            // Save individual folder to Cloud DB
+            async saveFolder(folder) {
+                if (cloudConfig.provider === 'local') return;
+                const url = this.getEndpointUrl(`folders/${folder.id}`);
+                if (!url) {
+                    this.pushAll(db);
+                    return;
+                }
+
+                try {
+                    this.setSyncState('syncing', 'Saving folder to Cloud...');
+                    const headers = { 'Content-Type': 'application/json' };
+                    await fetch(url, {
+                        method: 'PUT',
+                        headers,
+                        body: JSON.stringify(folder)
+                    });
+                    this.setSyncState('connected');
+                } catch (e) {
+                    this.pushAll(db);
+                }
+            },
+
+            // Permanently delete folder from Cloud DB
+            async deleteFolder(folderId) {
+                if (cloudConfig.provider === 'local') return;
+                const url = this.getEndpointUrl(`folders/${folderId}`);
+                try {
+                    this.setSyncState('syncing', 'Deleting from Cloud DB...');
+                    if (url) {
+                        await fetch(url, { method: 'DELETE' });
+                    }
+                    // Also delete any child items by pushing updated sync
+                    await this.pushAll(db);
+                    this.setSyncState('connected', 'Permanently Deleted from Cloud');
+                } catch (e) {
+                    console.warn("Cloud delete error, fallback full sync:", e);
+                    this.pushAll(db);
+                }
+            },
+
+            // Save individual file to Cloud DB
+            async saveFile(file) {
+                if (cloudConfig.provider === 'local') return;
+                const url = this.getEndpointUrl(`files/${file.id}`);
+                if (!url) {
+                    this.pushAll(db);
+                    return;
+                }
+
+                try {
+                    this.setSyncState('syncing', 'Uploading to Cloud DB...');
+                    const headers = { 'Content-Type': 'application/json' };
+                    await fetch(url, {
+                        method: 'PUT',
+                        headers,
+                        body: JSON.stringify(file)
+                    });
+                    this.setSyncState('connected');
+                } catch (e) {
+                    this.pushAll(db);
+                }
+            },
+
+            // Permanently delete file from Cloud DB
+            async deleteFile(fileId) {
+                if (cloudConfig.provider === 'local') return;
+                const url = this.getEndpointUrl(`files/${fileId}`);
+                try {
+                    this.setSyncState('syncing', 'Deleting file from Cloud DB...');
+                    if (url) {
+                        await fetch(url, { method: 'DELETE' });
+                    }
+                    await this.pushAll(db);
+                    this.setSyncState('connected', 'Permanently Deleted from Cloud');
+                } catch (e) {
+                    this.pushAll(db);
+                }
+            }
+        };
+
+        // ── Default Seed Data ──
+        const defaultData = {
             folders: [
                 { id: 'f_cv', parentId: 'root', name: 'Computer Vision Projects', category: 'Computer Vision', date: '2026-08-25' },
                 { id: 'f_ml', parentId: 'root', name: 'Machine Learning Models', category: 'Machine Learning', date: '2026-08-25' },
                 { id: 'f_ai', parentId: 'root', name: 'Deep Learning & AI', category: 'Deep Learning', date: '2026-08-25' },
                 { id: 'f_nlp', parentId: 'root', name: 'NLP & Speech Processing', category: 'NLP & Speech', date: '2026-08-25' },
-                { id: 'f_web', parentId: 'root', name: 'Web & Full Stack Apps', category: 'General', date: '2026-08-25' },
-                { id: 'f_ds', parentId: 'root', name: 'Data Science & Datasets', category: 'General', date: '2026-08-25' },
+                { id: 'f_web', parentId: 'root', name: 'Web & Full Stack Apps', category: 'Web Apps', date: '2026-08-25' },
+                { id: 'f_ds', parentId: 'root', name: 'Data Science & Datasets', category: 'Datasets', date: '2026-08-25' },
                 { id: 'f_docs', parentId: 'root', name: 'Reports, PPTs & IEEE Papers', category: 'Reports & PPT', date: '2026-08-25' },
                 { id: 'f_custom', parentId: 'root', name: 'My Custom Project Uploads', category: 'General', date: '2026-08-25' }
             ],
@@ -1082,76 +1976,260 @@
             ]
         };
 
-        // Load or initialize DB
-        function getDatabase() {
-            const saved = localStorage.getItem(DB_STORAGE_KEY);
-            if (saved) {
-                try { return JSON.parse(saved); } catch (e) { return defaultDatabase; }
-            }
-            return defaultDatabase;
-        }
-
-        function saveDatabase(databaseObj) {
-            localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(databaseObj));
-            updateStats();
-        }
-
-        let db = getDatabase();
+        let db = { folders: [], files: [] };
         let currentFolderId = 'root';
         let activeFilter = 'all';
         let searchQuery = '';
+        let viewMode = 'grid';
 
-        // ── Helper to format icons ──
-        function getItemIcon(item, isFolder) {
-            if (isFolder) return '📁';
-            const name = item.name.toLowerCase();
-            if (name.endsWith('.py')) return '🐍';
-            if (name.endsWith('.ipynb')) return '📓';
-            if (name.endsWith('.pdf')) return '📕';
-            if (name.endsWith('.pptx') || name.endsWith('.ppt')) return '📊';
-            if (name.endsWith('.csv') || name.endsWith('.xlsx')) return '🗃️';
-            if (name.endsWith('.json')) return '⚙️';
-            if (name.endsWith('.zip') || name.endsWith('.rar')) return '📦';
-            if (name.endsWith('.png') || name.endsWith('.jpg')) return '🖼️';
-            return '📄';
+        // ── IndexedDB & Local Cache ──
+        const DB_NAME = 'CodeBrainsDB_v2';
+        const DB_VERSION = 1;
+        let idb = null;
+
+        async function initDatabaseAndCloud() {
+            // 1. Initialize local cache first for instant rendering
+            initIDB(() => {
+                // 2. Fetch latest state from Online Cloud Database
+                syncFromCloud();
+            });
+        }
+
+        function initIDB(callback) {
+            const req = indexedDB.open(DB_NAME, DB_VERSION);
+            req.onupgradeneeded = (e) => {
+                const idbObj = e.target.result;
+                if (!idbObj.objectStoreNames.contains('folders')) {
+                    idbObj.createObjectStore('folders', { keyPath: 'id' });
+                }
+                if (!idbObj.objectStoreNames.contains('files')) {
+                    idbObj.createObjectStore('files', { keyPath: 'id' });
+                }
+            };
+            req.onsuccess = (e) => {
+                idb = e.target.result;
+                loadFromIDB(callback);
+            };
+            req.onerror = () => {
+                loadFromLocalStorage();
+                if (callback) callback();
+            };
+        }
+
+        function loadFromIDB(callback) {
+            const tx = idb.transaction(['folders', 'files'], 'readonly');
+            const fStore = tx.objectStore('folders');
+            const fileStore = tx.objectStore('files');
+
+            const reqFolders = fStore.getAll();
+            const reqFiles = fileStore.getAll();
+
+            let foldersLoaded = false;
+            let filesLoaded = false;
+
+            reqFolders.onsuccess = () => {
+                db.folders = reqFolders.result || [];
+                foldersLoaded = true;
+                if (filesLoaded) {
+                    if (db.folders.length === 0 && db.files.length === 0) {
+                        db = JSON.parse(JSON.stringify(defaultData));
+                        persistLocally();
+                    }
+                    renderExplorer();
+                    if (callback) callback();
+                }
+            };
+
+            reqFiles.onsuccess = () => {
+                db.files = reqFiles.result || [];
+                filesLoaded = true;
+                if (foldersLoaded) {
+                    if (db.folders.length === 0 && db.files.length === 0) {
+                        db = JSON.parse(JSON.stringify(defaultData));
+                        persistLocally();
+                    }
+                    renderExplorer();
+                    if (callback) callback();
+                }
+            };
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('codebrains_user_database_v1');
+            if (saved) {
+                try { db = JSON.parse(saved); } catch (e) { db = defaultData; }
+            } else {
+                db = JSON.parse(JSON.stringify(defaultData));
+            }
+            renderExplorer();
+        }
+
+        function persistLocally() {
+            if (idb) {
+                const tx = idb.transaction(['folders', 'files'], 'readwrite');
+                const fStore = tx.objectStore('folders');
+                const fileStore = tx.objectStore('files');
+                fStore.clear();
+                fileStore.clear();
+                db.folders.forEach(f => fStore.put(f));
+                db.files.forEach(file => fileStore.put(file));
+            }
+            try {
+                localStorage.setItem('codebrains_user_database_v1', JSON.stringify({
+                    folders: db.folders,
+                    files: db.files.map(f => ({
+                        ...f,
+                        content: f.content && f.content.length > 50000 ? '[Binary File]' : f.content
+                    }))
+                }));
+            } catch (e) {}
+            updateStats();
+        }
+
+        // ── Cloud Sync Pull Handler ──
+        async function syncFromCloud() {
+            if (cloudConfig.provider === 'local') return;
+
+            const cloudData = await CloudEngine.fetchAll();
+            if (cloudData && (cloudData.folders || cloudData.files)) {
+                // Convert object mapping to array if Firebase returns object keyed by id
+                let cloudFolders = [];
+                if (Array.isArray(cloudData.folders)) {
+                    cloudFolders = cloudData.folders.filter(Boolean);
+                } else if (typeof cloudData.folders === 'object' && cloudData.folders !== null) {
+                    cloudFolders = Object.values(cloudData.folders);
+                }
+
+                let cloudFiles = [];
+                if (Array.isArray(cloudData.files)) {
+                    cloudFiles = cloudData.files.filter(Boolean);
+                } else if (typeof cloudData.files === 'object' && cloudData.files !== null) {
+                    cloudFiles = Object.values(cloudData.files);
+                }
+
+                db.folders = cloudFolders;
+                db.files = cloudFiles;
+                persistLocally();
+                renderExplorer();
+                showToast("Synced with Online Cloud Database", "success");
+            } else if (cloudData === null && cloudConfig.provider !== 'local') {
+                // First time on new cloud store: push initial local data to seed cloud DB
+                await CloudEngine.pushAll(db);
+            }
+        }
+
+        // ── Helper to detect icon and category ──
+        function getFileDetails(name, explicitType) {
+            const ext = name.split('.').pop().toLowerCase();
+            let icon = '📄';
+            let category = 'document';
+
+            if (['py', 'ipynb', 'java', 'cpp', 'c', 'cs', 'php', 'js', 'ts', 'html', 'css', 'sql', 'sh'].includes(ext)) {
+                icon = ext === 'py' ? '🐍' : ext === 'ipynb' ? '📓' : '📝';
+                category = 'code';
+            } else if (['pptx', 'ppt', 'key'].includes(ext)) {
+                icon = '📊';
+                category = 'presentation';
+            } else if (['pdf', 'docx', 'doc', 'txt', 'rtf'].includes(ext)) {
+                icon = ext === 'pdf' ? '📕' : '📄';
+                category = (name.toLowerCase().includes('ieee') || name.toLowerCase().includes('paper')) ? 'paper' : 'report';
+            } else if (['csv', 'xlsx', 'xls', 'json', 'parquet', 'h5'].includes(ext)) {
+                icon = '🗃️';
+                category = 'dataset';
+            } else if (['png', 'jpg', 'jpeg', 'svg', 'webp', 'gif'].includes(ext)) {
+                icon = '🖼️';
+                category = 'image';
+            } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+                icon = '📦';
+                category = 'archive';
+            }
+
+            if (explicitType && explicitType !== 'auto') {
+                category = explicitType;
+            }
+
+            return { icon, category };
+        }
+
+        // ── Populate Folder Select Dropdowns in Modals ──
+        function updateFolderDropdowns() {
+            const selects = [
+                document.getElementById('folderParentSelect'),
+                document.getElementById('uploadFolderSelect'),
+                document.getElementById('codeFolderSelect'),
+                document.getElementById('moveDestinationSelect')
+            ];
+
+            selects.forEach(sel => {
+                if (!sel) return;
+                sel.innerHTML = '<option value="root">🏠 Root (Main Directory)</option>';
+                
+                function appendFolderOptions(parentId, depth = 0) {
+                    const children = db.folders.filter(f => f.parentId === parentId);
+                    children.forEach(f => {
+                        const opt = document.createElement('option');
+                        opt.value = f.id;
+                        const indent = '　'.repeat(depth) + (depth > 0 ? '↳ ' : '📁 ');
+                        opt.textContent = `${indent}${f.name}`;
+                        sel.appendChild(opt);
+                        appendFolderOptions(f.id, depth + 1);
+                    });
+                }
+                appendFolderOptions('root', 0);
+            });
+
+            if (document.getElementById('folderParentSelect')) document.getElementById('folderParentSelect').value = currentFolderId;
+            if (document.getElementById('uploadFolderSelect')) document.getElementById('uploadFolderSelect').value = currentFolderId;
+            if (document.getElementById('codeFolderSelect')) document.getElementById('codeFolderSelect').value = currentFolderId;
         }
 
         // ── Render Explorer ──
         function renderExplorer() {
             const grid = document.getElementById('dbItemsGrid');
             const emptyState = document.getElementById('dbEmptyState');
+            const dropzoneLabel = document.getElementById('dropzoneLabel');
             grid.innerHTML = '';
 
-            // Filter folders and files
+            grid.className = viewMode === 'list' ? 'db-list' : 'db-grid';
+
             let currentFolders = db.folders.filter(f => f.parentId === currentFolderId);
             let currentFiles = db.files.filter(f => f.folderId === currentFolderId);
 
-            // Apply search
             if (searchQuery) {
                 currentFolders = db.folders.filter(f => f.name.toLowerCase().includes(searchQuery));
                 currentFiles = db.files.filter(f => f.name.toLowerCase().includes(searchQuery));
             }
 
-            // Apply category filter
-            if (activeFilter === 'folder') currentFiles = [];
-            else if (activeFilter === 'code') {
+            if (activeFilter === 'folder') {
+                currentFiles = [];
+            } else if (activeFilter === 'code') {
                 currentFolders = [];
-                currentFiles = currentFiles.filter(f => f.type === 'code' || f.name.endsWith('.py') || f.name.endsWith('.ipynb'));
+                currentFiles = currentFiles.filter(f => f.type === 'code' || f.name.match(/\.(py|ipynb|js|html|css|cpp|java)$/i));
             } else if (activeFilter === 'presentation') {
                 currentFolders = [];
-                currentFiles = currentFiles.filter(f => f.type === 'presentation' || f.name.endsWith('.pptx') || f.name.endsWith('.ppt'));
+                currentFiles = currentFiles.filter(f => f.type === 'presentation' || f.name.match(/\.(pptx|ppt)$/i));
             } else if (activeFilter === 'report') {
                 currentFolders = [];
-                currentFiles = currentFiles.filter(f => f.type === 'report' || f.name.endsWith('.pdf') || f.name.endsWith('.docx'));
+                currentFiles = currentFiles.filter(f => f.type === 'report' || f.name.match(/\.(pdf|docx|doc)$/i));
             } else if (activeFilter === 'dataset') {
                 currentFolders = [];
-                currentFiles = currentFiles.filter(f => f.type === 'dataset' || f.name.endsWith('.csv') || f.name.endsWith('.json'));
+                currentFiles = currentFiles.filter(f => f.type === 'dataset' || f.name.match(/\.(csv|json|xlsx|sql)$/i));
             } else if (activeFilter === 'paper') {
                 currentFolders = [];
                 currentFiles = currentFiles.filter(f => f.type === 'paper');
+            } else if (activeFilter === 'image') {
+                currentFolders = [];
+                currentFiles = currentFiles.filter(f => f.type === 'image' || f.name.match(/\.(png|jpg|jpeg|svg|webp)$/i));
             }
 
             const totalItems = currentFolders.length + currentFiles.length;
+
+            const activeFolderObj = db.folders.find(f => f.id === currentFolderId);
+            if (currentFolderId === 'root') {
+                dropzoneLabel.textContent = `Drag & drop files here to upload into Root Directory & sync to Online Cloud DB`;
+            } else {
+                dropzoneLabel.textContent = `Drag & drop files here to upload directly into "${activeFolderObj ? activeFolderObj.name : 'this folder'}" & sync to Online Cloud DB`;
+            }
 
             if (totalItems === 0) {
                 emptyState.style.display = 'block';
@@ -1160,121 +2238,346 @@
 
                 // Render Folders
                 currentFolders.forEach(folder => {
+                    const subfolderCount = db.folders.filter(f => f.parentId === folder.id).length;
+                    const fileCount = db.files.filter(f => f.folderId === folder.id).length;
+
                     const card = document.createElement('div');
-                    card.className = 'db-item-card';
+                    card.className = 'db-item-card is-folder';
                     card.innerHTML = `
                         <div class="db-item-top">
-                            <span class="db-item-icon">📁</span>
-                            <button class="db-item-menu-btn" onclick="event.stopPropagation(); deleteFolder('${folder.id}')" title="Delete Folder">🗑️</button>
+                            <div class="db-item-icon-wrapper">
+                                <span class="db-item-icon">📁</span>
+                            </div>
+                            <div class="db-item-card-actions">
+                                <button class="db-item-action-btn" onclick="event.stopPropagation(); openUploadModalForFolder('${folder.id}')" title="Upload files directly into this folder">📤</button>
+                                <button class="db-item-action-btn" onclick="event.stopPropagation(); promptRename('folder', '${folder.id}')" title="Rename Folder">✏️</button>
+                                <button class="db-item-action-btn delete-btn" onclick="event.stopPropagation(); deleteFolder('${folder.id}')" title="Delete Folder from Online Database">🗑️</button>
+                            </div>
                         </div>
                         <div class="db-item-name">${folder.name}</div>
+                        <div class="db-item-tags">
+                            <span class="db-item-badge badge-folder">${folder.category || 'General'}</span>
+                            <span class="db-item-badge">${fileCount} files • ${subfolderCount} subfolders</span>
+                        </div>
                         <div class="db-item-meta">
-                            <span>${folder.category || 'Folder'}</span>
-                            <span>${folder.date}</span>
+                            <span>Folder</span>
+                            <span>${folder.date || '2026-08-26'}</span>
                         </div>
                     `;
-                    card.addEventListener('click', () => {
-                        currentFolderId = folder.id;
-                        renderBreadcrumbs();
-                        renderExplorer();
-                    });
+                    card.addEventListener('click', () => navigateToFolder(folder.id));
                     grid.appendChild(card);
                 });
 
                 // Render Files
                 currentFiles.forEach(file => {
+                    const { icon, category } = getFileDetails(file.name, file.type);
                     const card = document.createElement('div');
                     card.className = 'db-item-card';
-                    const icon = getItemIcon(file, false);
                     card.innerHTML = `
                         <div class="db-item-top">
-                            <span class="db-item-icon">${icon}</span>
-                            <button class="db-item-menu-btn" onclick="event.stopPropagation(); deleteFile('${file.id}')" title="Delete File">🗑️</button>
+                            <div class="db-item-icon-wrapper">
+                                <span class="db-item-icon">${icon}</span>
+                            </div>
+                            <div class="db-item-card-actions">
+                                <button class="db-item-action-btn" onclick="event.stopPropagation(); previewFileById('${file.id}')" title="Preview File">👁️</button>
+                                <button class="db-item-action-btn" onclick="event.stopPropagation(); downloadFileById('${file.id}')" title="Download File">📥</button>
+                                <button class="db-item-action-btn" onclick="event.stopPropagation(); openMoveModal('${file.id}')" title="Move to Folder">🔀</button>
+                                <button class="db-item-action-btn" onclick="event.stopPropagation(); promptRename('file', '${file.id}')" title="Rename File">✏️</button>
+                                <button class="db-item-action-btn delete-btn" onclick="event.stopPropagation(); deleteFile('${file.id}')" title="Permanently Delete from Online Database">🗑️</button>
+                            </div>
                         </div>
                         <div class="db-item-name">${file.name}</div>
+                        <div class="db-item-tags">
+                            <span class="db-item-badge">${category.toUpperCase()}</span>
+                        </div>
                         <div class="db-item-meta">
                             <span>${file.size || '1.0 KB'}</span>
-                            <span>${file.date}</span>
+                            <span>${file.date || '2026-08-26'}</span>
                         </div>
                     `;
-                    card.addEventListener('click', () => previewFile(file));
+                    card.addEventListener('click', () => previewFileById(file.id));
                     grid.appendChild(card);
                 });
             }
 
-            renderBreadcrumbs();
+            renderBreadcrumbsAndBanner();
             updateStats();
         }
 
-        // ── Render Breadcrumbs ──
-        function renderBreadcrumbs() {
+        // ── Render Breadcrumbs & In-Folder Banner ──
+        function renderBreadcrumbsAndBanner() {
             const bc = document.getElementById('dbBreadcrumbs');
+            const banner = document.getElementById('dbFolderBanner');
+            const quickBack = document.getElementById('quickBackBtnContainer');
+
             if (currentFolderId === 'root') {
-                bc.innerHTML = `<span class="db-breadcrumb-link" onclick="navigateToFolder('root')">Root (All Folders)</span>`;
+                bc.innerHTML = `<span class="db-breadcrumb-link" onclick="navigateToFolder('root')">🏠 Root</span>`;
+                banner.style.display = 'none';
+                quickBack.style.display = 'none';
                 return;
             }
 
-            const current = db.folders.find(f => f.id === currentFolderId);
-            bc.innerHTML = `
-                <span class="db-breadcrumb-link" onclick="navigateToFolder('root')">Root</span>
-                <span>/</span>
-                <span style="color: var(--text-primary); font-weight: 700;">${current ? current.name : 'Folder'}</span>
-            `;
+            const trail = [];
+            let curr = db.folders.find(f => f.id === currentFolderId);
+            const activeFolderObj = curr;
+
+            while (curr) {
+                trail.unshift(curr);
+                curr = db.folders.find(f => f.id === curr.parentId);
+            }
+
+            let bcHtml = `<span class="db-breadcrumb-link" onclick="navigateToFolder('root')">🏠 Root</span>`;
+            trail.forEach((item, index) => {
+                bcHtml += `<span class="db-breadcrumb-separator">/</span>`;
+                if (index === trail.length - 1) {
+                    bcHtml += `<span class="db-breadcrumb-current">📁 ${item.name}</span>`;
+                } else {
+                    bcHtml += `<span class="db-breadcrumb-link" onclick="navigateToFolder('${item.id}')">📁 ${item.name}</span>`;
+                }
+            });
+            bc.innerHTML = bcHtml;
+            quickBack.style.display = 'block';
+
+            if (activeFolderObj) {
+                banner.style.display = 'flex';
+                document.getElementById('bannerFolderName').textContent = activeFolderObj.name;
+                document.getElementById('bannerFolderCategory').textContent = activeFolderObj.category || 'General';
+
+                const subCount = db.folders.filter(f => f.parentId === activeFolderObj.id).length;
+                const fCount = db.files.filter(f => f.folderId === activeFolderObj.id).length;
+                document.getElementById('bannerFolderStats').textContent = `${fCount} files • ${subCount} subfolders stored in this folder`;
+            } else {
+                banner.style.display = 'none';
+            }
         }
 
-        window.navigateToFolder = function(id) {
-            currentFolderId = id;
+        window.navigateToFolder = function(folderId) {
+            currentFolderId = folderId;
             searchQuery = '';
             document.getElementById('dbSearchInput').value = '';
             renderExplorer();
+            window.scrollTo({ top: 180, behavior: 'smooth' });
         };
+
+        document.getElementById('btnBackToParent').addEventListener('click', () => {
+            if (currentFolderId === 'root') return;
+            const curr = db.folders.find(f => f.id === currentFolderId);
+            if (curr) {
+                navigateToFolder(curr.parentId || 'root');
+            } else {
+                navigateToFolder('root');
+            }
+        });
 
         // ── Update Statistics ──
         function updateStats() {
             document.getElementById('statFolders').textContent = db.folders.length;
             document.getElementById('statFiles').textContent = db.files.length;
-            const approxMB = (db.files.length * 1.1 + db.folders.length * 0.2).toFixed(1);
-            document.getElementById('statStorage').textContent = approxMB + ' MB';
         }
 
-        // ── Delete File / Folder ──
-        window.deleteFolder = function(id) {
-            if (confirm("Are you sure you want to delete this folder and its files?")) {
-                db.folders = db.folders.filter(f => f.id !== id);
-                db.files = db.files.filter(f => f.folderId !== id);
-                saveDatabase(db);
+        // ── Delete Actions (Permanently removes from Online Cloud DB) ──
+        window.deleteFolder = async function(id) {
+            const folder = db.folders.find(f => f.id === id);
+            const folderName = folder ? folder.name : 'this folder';
+            if (confirm(`Are you sure you want to PERMANENTLY delete folder "${folderName}" and all its contents from Online Cloud Database?`)) {
+                const toDelete = [id];
+                function collectChildren(pId) {
+                    db.folders.filter(f => f.parentId === pId).forEach(child => {
+                        toDelete.push(child.id);
+                        collectChildren(child.id);
+                    });
+                }
+                collectChildren(id);
+
+                db.folders = db.folders.filter(f => !toDelete.includes(f.id));
+                db.files = db.files.filter(f => !toDelete.includes(f.folderId));
+
+                if (toDelete.includes(currentFolderId)) {
+                    currentFolderId = 'root';
+                }
+
+                persistLocally();
                 renderExplorer();
+
+                // Delete from Online Cloud Database
+                await CloudEngine.deleteFolder(id);
+                showToast(`Folder "${folderName}" permanently deleted from Cloud DB`, "info");
             }
         };
 
-        window.deleteFile = function(id) {
-            if (confirm("Delete this file permanently?")) {
-                db.files = db.files.filter(f => f.id !== id);
-                saveDatabase(db);
-                renderExplorer();
+        // Banner delete button
+        document.getElementById('bannerDeleteBtn').addEventListener('click', () => {
+            if (currentFolderId !== 'root') {
+                deleteFolder(currentFolderId);
             }
-        };
-
-        // ── Preview & Download ──
-        let activePreviewFile = null;
-
-        function previewFile(file) {
-            activePreviewFile = file;
-            document.getElementById('previewTitle').textContent = `📄 ${file.name}`;
-            document.getElementById('previewContent').textContent = file.content || `[Binary / File Package: ${file.name}]\nSize: ${file.size}\nDate Stored: ${file.date}\nStatus: Ready to export / download.`;
-            document.getElementById('previewModal').classList.add('active');
-        }
-
-        document.getElementById('btnDownloadPreview').addEventListener('click', () => {
-            if (!activePreviewFile) return;
-            const blob = new Blob([activePreviewFile.content || "Code Brains Asset File"], { type: 'text/plain;charset=utf-8' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = activePreviewFile.name;
-            a.click();
         });
 
-        // ── Modals & Actions ──
+        window.deleteFile = async function(id) {
+            const file = db.files.find(f => f.id === id);
+            const fileName = file ? file.name : 'this file';
+            if (confirm(`PERMANENTLY delete file "${fileName}" from Online Cloud Database?`)) {
+                db.files = db.files.filter(f => f.id !== id);
+                persistLocally();
+                renderExplorer();
+
+                // Delete from Online Cloud Database
+                await CloudEngine.deleteFile(id);
+                showToast(`File "${fileName}" permanently deleted from Cloud DB`, "info");
+            }
+        };
+
+        // ── Rename Actions ──
+        let itemToRename = null;
+
+        window.promptRename = function(type, id) {
+            itemToRename = { type, id };
+            const item = type === 'folder' ? db.folders.find(f => f.id === id) : db.files.find(f => f.id === id);
+            if (!item) return;
+
+            document.getElementById('renameInput').value = item.name;
+            document.getElementById('renameModal').classList.add('active');
+        };
+
+        document.getElementById('btnConfirmRename').addEventListener('click', async () => {
+            if (!itemToRename) return;
+            const newName = document.getElementById('renameInput').value.trim();
+            if (!newName) return alert("Please enter a valid name");
+
+            let targetItem = null;
+            if (itemToRename.type === 'folder') {
+                const folder = db.folders.find(f => f.id === itemToRename.id);
+                if (folder) {
+                    folder.name = newName;
+                    targetItem = folder;
+                }
+            } else {
+                const file = db.files.find(f => f.id === itemToRename.id);
+                if (file) {
+                    file.name = newName;
+                    const { category } = getFileDetails(newName);
+                    file.type = category;
+                    targetItem = file;
+                }
+            }
+
+            persistLocally();
+            document.getElementById('renameModal').classList.remove('active');
+            renderExplorer();
+
+            // Sync update to Cloud DB
+            if (itemToRename.type === 'folder' && targetItem) {
+                await CloudEngine.saveFolder(targetItem);
+            } else if (targetItem) {
+                await CloudEngine.saveFile(targetItem);
+            }
+
+            showToast("Renamed & synced online", "success");
+        });
+
+        // ── Move Item Actions ──
+        let itemToMoveId = null;
+
+        window.openMoveModal = function(fileId) {
+            itemToMoveId = fileId;
+            const file = db.files.find(f => f.id === fileId);
+            if (!file) return;
+
+            document.getElementById('moveItemName').textContent = file.name;
+            updateFolderDropdowns();
+            document.getElementById('moveDestinationSelect').value = file.folderId || 'root';
+            document.getElementById('moveModal').classList.add('active');
+        };
+
+        document.getElementById('btnConfirmMove').addEventListener('click', async () => {
+            if (!itemToMoveId) return;
+            const targetFolder = document.getElementById('moveDestinationSelect').value;
+            const file = db.files.find(f => f.id === itemToMoveId);
+            if (file) {
+                file.folderId = targetFolder;
+                persistLocally();
+                document.getElementById('moveModal').classList.remove('active');
+                renderExplorer();
+
+                await CloudEngine.saveFile(file);
+                const destObj = db.folders.find(f => f.id === targetFolder);
+                showToast(`Moved "${file.name}" to ${destObj ? destObj.name : 'Root'} & synced online`, "success");
+            }
+        });
+
+        // ── Preview & Download Actions ──
+        let activePreviewFile = null;
+
+        window.previewFileById = function(id) {
+            const file = db.files.find(f => f.id === id);
+            if (!file) return;
+            activePreviewFile = file;
+
+            document.getElementById('previewTitle').textContent = `📄 ${file.name}`;
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+
+            const isImage = file.name.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i) || (file.content && file.content.startsWith('data:image/'));
+
+            if (isImage) {
+                const imgBox = document.createElement('div');
+                imgBox.className = 'image-preview-box';
+                const img = document.createElement('img');
+                img.src = file.content;
+                img.alt = file.name;
+                imgBox.appendChild(img);
+                container.appendChild(imgBox);
+            } else {
+                const codeBox = document.createElement('div');
+                codeBox.className = 'code-preview-box';
+                codeBox.textContent = file.content || `[Binary File: ${file.name}]\nSize: ${file.size}\nDate: ${file.date}\nClick "Download File" below to download.`;
+                container.appendChild(codeBox);
+            }
+
+            document.getElementById('previewModal').classList.add('active');
+        };
+
+        window.downloadFileById = function(id) {
+            const file = db.files.find(f => f.id === id);
+            if (!file) return;
+
+            let blob;
+            if (file.content && file.content.startsWith('data:')) {
+                const arr = file.content.split(',');
+                const mime = arr[0].match(/:(.*?);/)[1];
+                const bstr = atob(arr[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                    u8arr[n] = bstr.charCodeAt(n);
+                }
+                blob = new Blob([u8arr], { type: mime });
+            } else {
+                blob = new Blob([file.content || ''], { type: 'text/plain;charset=utf-8' });
+            }
+
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = file.name;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            showToast(`Downloading "${file.name}"`, "info");
+        };
+
+        document.getElementById('btnDownloadPreview').addEventListener('click', () => {
+            if (activePreviewFile) downloadFileById(activePreviewFile.id);
+        });
+
+        document.getElementById('btnCopyPreview').addEventListener('click', () => {
+            if (!activePreviewFile) return;
+            if (activePreviewFile.content) {
+                navigator.clipboard.writeText(activePreviewFile.content).then(() => {
+                    showToast("Content copied to clipboard!", "success");
+                });
+            }
+        });
+
+        // ── Modal Handling & Close buttons ──
         document.querySelectorAll('[data-close]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.dataset.close;
@@ -1282,92 +2585,164 @@
             });
         });
 
-        // Open New Folder Modal
-        document.getElementById('btnNewFolder').addEventListener('click', () => {
+        // ── Create Folder Modal Triggers ──
+        function openNewFolderModal(defaultParent = currentFolderId) {
+            updateFolderDropdowns();
+            document.getElementById('folderParentSelect').value = defaultParent;
             document.getElementById('folderNameInput').value = '';
+            document.getElementById('folderCategorySelect').value = 'General';
             document.getElementById('folderModal').classList.add('active');
-        });
+            setTimeout(() => document.getElementById('folderNameInput').focus(), 100);
+        }
 
-        document.getElementById('btnConfirmFolder').addEventListener('click', () => {
+        document.getElementById('btnNewFolder').addEventListener('click', () => openNewFolderModal(currentFolderId));
+        document.getElementById('bannerNewSubfolderBtn').addEventListener('click', () => openNewFolderModal(currentFolderId));
+        document.getElementById('emptyFolderBtn').addEventListener('click', () => openNewFolderModal(currentFolderId));
+
+        document.getElementById('btnConfirmFolder').addEventListener('click', async () => {
             const name = document.getElementById('folderNameInput').value.trim();
             if (!name) return alert("Please enter a folder name");
-            const cat = document.getElementById('folderCategorySelect').value;
+            const parentId = document.getElementById('folderParentSelect').value;
+            const category = document.getElementById('folderCategorySelect').value;
+
             const newFolder = {
-                id: 'f_' + Date.now(),
-                parentId: currentFolderId,
+                id: 'f_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                parentId: parentId,
                 name: name,
-                category: cat,
+                category: category,
                 date: new Date().toISOString().split('T')[0]
             };
+
             db.folders.push(newFolder);
-            saveDatabase(db);
+            persistLocally();
             document.getElementById('folderModal').classList.remove('active');
             renderExplorer();
+
+            // Save to Online Cloud Database
+            await CloudEngine.saveFolder(newFolder);
+            showToast(`Folder "${name}" saved to Online Cloud DB`, "success");
         });
 
-        // Open Create Code Modal
-        document.getElementById('btnNewCode').addEventListener('click', () => {
-            document.getElementById('codeFileNameInput').value = '';
-            document.getElementById('codeFileContentInput').value = '';
-            document.getElementById('codeModal').classList.add('active');
-        });
+        // ── Upload Files Modal Triggers ──
+        let stagedFiles = [];
 
-        document.getElementById('btnConfirmCode').addEventListener('click', () => {
-            const name = document.getElementById('codeFileNameInput').value.trim();
-            const content = document.getElementById('codeFileContentInput').value;
-            if (!name) return alert("Please enter a file name (e.g. model.py)");
-            const newFile = {
-                id: 'file_' + Date.now(),
-                folderId: currentFolderId,
-                name: name,
-                type: 'code',
-                size: (content.length / 1024).toFixed(1) + ' KB',
-                date: new Date().toISOString().split('T')[0],
-                content: content
-            };
-            db.files.push(newFile);
-            saveDatabase(db);
-            document.getElementById('codeModal').classList.remove('active');
-            renderExplorer();
-        });
+        function openUploadModalForFolder(targetFolderId = currentFolderId) {
+            updateFolderDropdowns();
+            document.getElementById('uploadFolderSelect').value = targetFolderId;
+            stagedFiles = [];
+            renderStagedQueue();
+            document.getElementById('uploadModal').classList.add('active');
+        }
 
-        // Upload File Action
-        const hiddenFileInput = document.getElementById('hiddenFileInput');
-        document.getElementById('btnUploadFile').addEventListener('click', () => hiddenFileInput.click());
-        document.getElementById('dbDropzone').addEventListener('click', () => hiddenFileInput.click());
+        document.getElementById('btnUploadFile').addEventListener('click', () => openUploadModalForFolder(currentFolderId));
+        document.getElementById('bannerUploadBtn').addEventListener('click', () => openUploadModalForFolder(currentFolderId));
+        document.getElementById('emptyUploadBtn').addEventListener('click', () => openUploadModalForFolder(currentFolderId));
 
-        hiddenFileInput.addEventListener('change', function() {
-            handleFileUpload(this.files);
-        });
+        const modalDropzone = document.getElementById('modalDropzone');
+        const modalFileInput = document.getElementById('modalFileInput');
 
-        // Drag & Drop
-        const dropzone = document.getElementById('dbDropzone');
-        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
-        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
-        dropzone.addEventListener('drop', (e) => {
+        modalDropzone.addEventListener('click', () => modalFileInput.click());
+        modalDropzone.addEventListener('dragover', (e) => { e.preventDefault(); modalDropzone.classList.add('dragover'); });
+        modalDropzone.addEventListener('dragleave', () => modalDropzone.classList.remove('dragover'));
+        modalDropzone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropzone.classList.remove('dragover');
-            handleFileUpload(e.dataTransfer.files);
+            modalDropzone.classList.remove('dragover');
+            stageFiles(e.dataTransfer.files);
         });
 
-        function handleFileUpload(fileList) {
+        modalFileInput.addEventListener('change', function() {
+            stageFiles(this.files);
+        });
+
+        function stageFiles(fileList) {
             Array.from(fileList).forEach(file => {
+                stagedFiles.push(file);
+            });
+            renderStagedQueue();
+        }
+
+        function renderStagedQueue() {
+            const container = document.getElementById('stagedFilesContainer');
+            const list = document.getElementById('uploadQueueList');
+            const count = document.getElementById('stagedFilesCount');
+            const btnUpload = document.getElementById('btnConfirmUpload');
+
+            if (stagedFiles.length === 0) {
+                container.style.display = 'none';
+                btnUpload.disabled = true;
+                return;
+            }
+
+            container.style.display = 'block';
+            btnUpload.disabled = false;
+            count.textContent = stagedFiles.length;
+            list.innerHTML = '';
+
+            stagedFiles.forEach((file, index) => {
+                const { icon } = getFileDetails(file.name);
+                const item = document.createElement('div');
+                item.className = 'upload-queue-item';
+                item.innerHTML = `
+                    <div class="upload-queue-name">
+                        <span>${icon}</span>
+                        <span>${file.name}</span>
+                        <span style="color: var(--text-muted); font-size: 0.74rem;">(${(file.size / 1024).toFixed(1)} KB)</span>
+                    </div>
+                    <button type="button" class="db-item-action-btn delete-btn" onclick="removeStagedFile(${index})">✕</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        window.removeStagedFile = function(index) {
+            stagedFiles.splice(index, 1);
+            renderStagedQueue();
+        };
+
+        document.getElementById('btnConfirmUpload').addEventListener('click', async () => {
+            const targetFolder = document.getElementById('uploadFolderSelect').value;
+            const categoryPreference = document.getElementById('uploadCategorySelect').value;
+
+            if (stagedFiles.length === 0) return;
+
+            const btn = document.getElementById('btnConfirmUpload');
+            btn.disabled = true;
+            btn.textContent = 'Uploading to Cloud...';
+
+            for (const file of stagedFiles) {
+                await processAndSaveFile(file, targetFolder, categoryPreference);
+            }
+
+            persistLocally();
+            document.getElementById('uploadModal').classList.remove('active');
+            btn.textContent = 'Upload & Save Online';
+            stagedFiles = [];
+            renderExplorer();
+
+            const targetObj = db.folders.find(f => f.id === targetFolder);
+            showToast(`Uploaded & synced to Online Cloud DB`, "success");
+        });
+
+        function processAndSaveFile(file, folderId, explicitCategory) {
+            return new Promise((resolve) => {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
+                    const { category } = getFileDetails(file.name, explicitCategory);
                     const newFile = {
-                        id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                        folderId: currentFolderId,
+                        id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+                        folderId: folderId,
                         name: file.name,
-                        type: file.name.endsWith('.py') ? 'code' : file.name.endsWith('.pptx') ? 'presentation' : 'report',
-                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        type: category,
+                        size: file.size > 1048576 ? (file.size / 1048576).toFixed(1) + ' MB' : (file.size / 1024).toFixed(1) + ' KB',
                         date: new Date().toISOString().split('T')[0],
                         content: e.target.result
                     };
                     db.files.push(newFile);
-                    saveDatabase(db);
-                    renderExplorer();
+                    await CloudEngine.saveFile(newFile);
+                    resolve();
                 };
-                if (file.name.match(/\.(py|ipynb|txt|csv|json|md|html|css|js)$/i)) {
+
+                if (file.name.match(/\.(py|ipynb|txt|csv|json|md|html|css|js|sql|sh|xml|yaml|yml)$/i)) {
                     reader.readAsText(file);
                 } else {
                     reader.readAsDataURL(file);
@@ -1375,13 +2750,287 @@
             });
         }
 
-        // Search Filter
+        // ── Direct Dashboard Drag & Drop ──
+        const dbDropzone = document.getElementById('dbDropzone');
+        const hiddenFileInput = document.getElementById('hiddenFileInput');
+
+        dbDropzone.addEventListener('click', () => hiddenFileInput.click());
+        hiddenFileInput.addEventListener('change', async function() {
+            if (this.files.length > 0) {
+                for (const file of Array.from(this.files)) {
+                    await processAndSaveFile(file, currentFolderId, 'auto');
+                }
+                persistLocally();
+                renderExplorer();
+                const folderName = currentFolderId === 'root' ? 'Root' : (db.folders.find(f => f.id === currentFolderId)?.name || 'Folder');
+                showToast(`Uploaded ${this.files.length} file(s) to ${folderName} & synced to Cloud DB`, "success");
+                this.value = '';
+            }
+        });
+
+        dbDropzone.addEventListener('dragover', (e) => { e.preventDefault(); dbDropzone.classList.add('dragover'); });
+        dbDropzone.addEventListener('dragleave', () => dbDropzone.classList.remove('dragover'));
+        dbDropzone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dbDropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0) {
+                for (const file of Array.from(e.dataTransfer.files)) {
+                    await processAndSaveFile(file, currentFolderId, 'auto');
+                }
+                persistLocally();
+                renderExplorer();
+                const folderName = currentFolderId === 'root' ? 'Root' : (db.folders.find(f => f.id === currentFolderId)?.name || 'Folder');
+                showToast(`Uploaded ${e.dataTransfer.files.length} file(s) to ${folderName} & synced to Cloud DB`, "success");
+            }
+        });
+
+        // ── Create Code File Modal & Templates ──
+        const CODE_TEMPLATES = {
+            blank: '',
+            yolo: `import cv2
+from ultralytics import YOLO
+
+# Initialize YOLOv8 Model
+model = YOLO("yolov8n.pt")
+
+def detect_objects(image_path):
+    results = model(image_path)
+    for result in results:
+        boxes = result.boxes
+        for box in boxes:
+            cls_id = int(box.cls[0])
+            conf = float(box.conf[0])
+            name = model.names[cls_id]
+            print(f"Detected: {name} (Confidence: {conf:.2f})")
+
+if __name__ == "__main__":
+    print("🚀 YOLOv8 Model Script Initialized")
+`,
+            rf: `import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report, accuracy_score
+
+# Load Dataset
+df = pd.read_csv("dataset.csv")
+X = df.drop(columns=['target'])
+y = df['target']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+preds = model.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, preds)*100:.2f}%")
+print(classification_report(y_test, preds))
+`,
+            opencv: `import cv2
+import numpy as np
+
+# Open Webcam or Video Feed
+cap = cv2.VideoCapture(0)
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    cv2.imshow("Original Frame", frame)
+    cv2.imshow("Processed Frame", blurred)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+`,
+            fastapi: `from fastapi import FastAPI, UploadFile, File
+import uvicorn
+
+app = FastAPI(title="Code Brains AI Model Inference API")
+
+@app.get("/")
+def root():
+    return {"message": "Code Brains AI API Server Running", "status": "online"}
+
+@app.post("/predict")
+async def predict_sample(data: dict):
+    return {"status": "success", "prediction": "Class A", "confidence": 0.95}
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+`
+        };
+
+        function openCreateCodeModal() {
+            updateFolderDropdowns();
+            document.getElementById('codeFolderSelect').value = currentFolderId;
+            document.getElementById('codeFileNameInput').value = '';
+            document.getElementById('codeTemplateSelect').value = 'blank';
+            document.getElementById('codeFileContentInput').value = '';
+            document.getElementById('codeModal').classList.add('active');
+        }
+
+        document.getElementById('btnNewCode').addEventListener('click', openCreateCodeModal);
+        document.getElementById('bannerNewCodeBtn').addEventListener('click', openCreateCodeModal);
+        document.getElementById('emptyCodeBtn').addEventListener('click', openCreateCodeModal);
+
+        document.getElementById('codeTemplateSelect').addEventListener('change', function() {
+            const templateKey = this.value;
+            if (CODE_TEMPLATES[templateKey]) {
+                document.getElementById('codeFileContentInput').value = CODE_TEMPLATES[templateKey];
+                if (!document.getElementById('codeFileNameInput').value) {
+                    document.getElementById('codeFileNameInput').value = templateKey === 'fastapi' ? 'api_server.py' : templateKey + '_model.py';
+                }
+            }
+        });
+
+        document.getElementById('btnConfirmCode').addEventListener('click', async () => {
+            const name = document.getElementById('codeFileNameInput').value.trim();
+            const content = document.getElementById('codeFileContentInput').value;
+            const targetFolder = document.getElementById('codeFolderSelect').value;
+
+            if (!name) return alert("Please enter a file name (e.g. model.py)");
+
+            const { category } = getFileDetails(name, 'code');
+            const newFile = {
+                id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                folderId: targetFolder,
+                name: name,
+                type: category,
+                size: (content.length / 1024).toFixed(1) + ' KB',
+                date: new Date().toISOString().split('T')[0],
+                content: content
+            };
+
+            db.files.push(newFile);
+            persistLocally();
+            document.getElementById('codeModal').classList.remove('active');
+            renderExplorer();
+
+            await CloudEngine.saveFile(newFile);
+            showToast(`Saved code file "${name}" to Cloud DB`, "success");
+        });
+
+        // ── Banner Rename Folder Button ──
+        document.getElementById('bannerRenameBtn').addEventListener('click', () => {
+            if (currentFolderId !== 'root') {
+                promptRename('folder', currentFolderId);
+            }
+        });
+
+        // ── Cloud Database Settings Modal & Actions ──
+        function openCloudSettingsModal() {
+            document.getElementById('cloudProviderSelect').value = cloudConfig.provider || 'firebase';
+            document.getElementById('cloudUrlInput').value = cloudConfig.url || '';
+            document.getElementById('cloudKeyInput').value = cloudConfig.key || '';
+            document.getElementById('cloudPathInput').value = cloudConfig.path || 'codebrains_db';
+            updateCloudSettingsFormVisibility();
+            document.getElementById('cloudSettingsModal').classList.add('active');
+        }
+
+        function updateCloudSettingsFormVisibility() {
+            const provider = document.getElementById('cloudProviderSelect').value;
+            const urlGroup = document.getElementById('cloudUrlGroup');
+            const keyGroup = document.getElementById('cloudKeyGroup');
+            const urlLabel = document.getElementById('cloudUrlLabel');
+            const urlHint = document.getElementById('cloudUrlHint');
+
+            if (provider === 'local') {
+                urlGroup.style.display = 'none';
+                keyGroup.style.display = 'none';
+            } else if (provider === 'firebase' || provider === 'builtin') {
+                urlGroup.style.display = 'block';
+                keyGroup.style.display = 'block';
+                urlLabel.textContent = 'Firebase Realtime Database URL';
+                urlHint.textContent = 'e.g. https://your-project-default-rtdb.firebaseio.com/';
+            } else if (provider === 'supabase') {
+                urlGroup.style.display = 'block';
+                keyGroup.style.display = 'block';
+                urlLabel.textContent = 'Supabase REST Endpoint URL';
+                urlHint.textContent = 'e.g. https://your-project.supabase.co/rest/v1/';
+            } else {
+                urlGroup.style.display = 'block';
+                keyGroup.style.display = 'block';
+                urlLabel.textContent = 'Custom Cloud Endpoint URL';
+                urlHint.textContent = 'e.g. https://api.yourdomain.com/v1/database';
+            }
+        }
+
+        document.getElementById('cloudProviderSelect').addEventListener('change', updateCloudSettingsFormVisibility);
+        document.getElementById('btnCloudSettings').addEventListener('click', openCloudSettingsModal);
+        document.getElementById('cloudStatusBadge').addEventListener('click', openCloudSettingsModal);
+
+        document.getElementById('btnSaveCloudSettings').addEventListener('click', async () => {
+            cloudConfig.provider = document.getElementById('cloudProviderSelect').value;
+            cloudConfig.url = document.getElementById('cloudUrlInput').value.trim();
+            cloudConfig.key = document.getElementById('cloudKeyInput').value.trim();
+            cloudConfig.path = document.getElementById('cloudPathInput').value.trim() || 'codebrains_db';
+            saveCloudConfig();
+
+            document.getElementById('cloudSettingsModal').classList.remove('active');
+            showToast("Cloud configuration saved", "success");
+            await syncFromCloud();
+        });
+
+        document.getElementById('btnTestCloudConnection').addEventListener('click', async () => {
+            const statusEl = document.getElementById('cloudTestStatus');
+            statusEl.textContent = 'Testing connection...';
+            statusEl.style.color = 'var(--accent-1)';
+
+            const testUrl = CloudEngine.getEndpointUrl();
+            if (!testUrl) {
+                statusEl.textContent = 'Offline Mode (Local Only)';
+                statusEl.style.color = '#f87171';
+                return;
+            }
+
+            try {
+                const res = await fetch(testUrl, { method: 'GET' });
+                if (res.ok) {
+                    statusEl.textContent = '🟢 Online Connection Successful (HTTP ' + res.status + ')';
+                    statusEl.style.color = '#34d399';
+                } else {
+                    statusEl.textContent = '⚠️ Cloud returned HTTP ' + res.status;
+                    statusEl.style.color = '#fbbf24';
+                }
+            } catch (err) {
+                statusEl.textContent = '❌ Connection failed: ' + err.message;
+                statusEl.style.color = '#f87171';
+            }
+        });
+
+        document.getElementById('btnPushLocalToCloud').addEventListener('click', async () => {
+            const ok = await CloudEngine.pushAll(db);
+            if (ok) {
+                showToast("All local folders & files pushed to Cloud DB!", "success");
+            } else {
+                showToast("Failed to push data to cloud. Check cloud URL.", "error");
+            }
+        });
+
+        document.getElementById('btnPullCloudToLocal').addEventListener('click', async () => {
+            await syncFromCloud();
+        });
+
+        // Sync Online DB button on toolbar
+        document.getElementById('btnSyncCloud').addEventListener('click', async () => {
+            const btn = document.getElementById('btnSyncCloud');
+            btn.innerHTML = '<span>🔄</span> Syncing...';
+            await syncFromCloud();
+            btn.innerHTML = '<span>🔄</span> Sync Online DB';
+        });
+
+        // ── Search & Filter ──
         document.getElementById('dbSearchInput').addEventListener('input', function() {
             searchQuery = this.value.toLowerCase().trim();
             renderExplorer();
         });
 
-        // Category Filter Chips
         document.querySelectorAll('.db-chip').forEach(chip => {
             chip.addEventListener('click', () => {
                 document.querySelectorAll('.db-chip').forEach(c => c.classList.remove('active'));
@@ -1391,7 +3040,22 @@
             });
         });
 
-        // Backup / Export Database to JSON
+        // ── View Mode Toggles ──
+        document.getElementById('viewModeGrid').addEventListener('click', () => {
+            viewMode = 'grid';
+            document.getElementById('viewModeGrid').classList.add('active');
+            document.getElementById('viewModeList').classList.remove('active');
+            renderExplorer();
+        });
+
+        document.getElementById('viewModeList').addEventListener('click', () => {
+            viewMode = 'list';
+            document.getElementById('viewModeList').classList.add('active');
+            document.getElementById('viewModeGrid').classList.remove('active');
+            renderExplorer();
+        });
+
+        // ── Backup / Export Database to JSON ──
         document.getElementById('btnExportDb').addEventListener('click', () => {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
             const downloadAnchor = document.createElement('a');
@@ -1400,9 +3064,10 @@
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
+            showToast("Database backup downloaded successfully", "success");
         });
 
-        // Restore / Import Database from JSON
+        // ── Restore / Import Database from JSON ──
         document.getElementById('btnImportDb').addEventListener('click', () => {
             const input = document.createElement('input');
             input.type = 'file';
@@ -1410,17 +3075,20 @@
             input.onchange = e => {
                 const file = e.target.files[0];
                 const reader = new FileReader();
-                reader.onload = event => {
+                reader.onload = async event => {
                     try {
                         const parsed = JSON.parse(event.target.result);
                         if (parsed.folders && parsed.files) {
                             db = parsed;
-                            saveDatabase(db);
+                            persistLocally();
                             renderExplorer();
-                            alert("Database restored successfully!");
+                            await CloudEngine.pushAll(db);
+                            showToast("Database restored & synced to Cloud DB!", "success");
+                        } else {
+                            alert("Invalid database JSON structure.");
                         }
                     } catch (err) {
-                        alert("Invalid database JSON file.");
+                        alert("Error reading JSON file.");
                     }
                 };
                 reader.readAsText(file);
@@ -1428,7 +3096,7 @@
             input.click();
         });
 
-        // Initialize Authentication on load
+        // ── Initialize on page load ──
         checkAuth();
     </script>
 </body>
