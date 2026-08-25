@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CODE BRAINS — Private Cloud & File Database</title>
-    <meta name="description" content="Personal and private online cloud file and folder database management for CODE BRAINS projects, source code, reports, PPTs, datasets, and IEEE papers.">
+    <title>CODE BRAINS — Supabase Cloud Database</title>
+    <meta name="description" content="Personal and private Supabase cloud file and folder database management for CODE BRAINS projects, source code, reports, PPTs, datasets, and IEEE papers.">
     <link rel="icon" type="image/png" href="static/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="static/css/style.css">
+    <!-- Official Supabase JS SDK v2 -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         .db-layout {
             padding: 90px 0 60px;
@@ -235,9 +237,9 @@
             font-weight: 700;
             cursor: pointer;
             transition: var(--transition);
-            background: rgba(16, 185, 129, 0.12);
-            color: #34d399;
-            border: 1px solid rgba(16, 185, 129, 0.25);
+            background: rgba(62, 207, 142, 0.12);
+            color: #3ecf8e;
+            border: 1px solid rgba(62, 207, 142, 0.3);
         }
 
         .db-cloud-badge.syncing {
@@ -389,15 +391,15 @@
             transform: translateY(-2px);
         }
 
-        .db-btn-cloud {
-            background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-            color: #ffffff;
-            font-weight: 700;
+        .db-btn-supabase {
+            background: linear-gradient(135deg, #3ecf8e 0%, #2ba670 100%);
+            color: #0b1f14;
+            font-weight: 800;
             border: none;
         }
 
-        .db-btn-cloud:hover {
-            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.35);
+        .db-btn-supabase:hover {
+            box-shadow: 0 6px 20px rgba(62, 207, 142, 0.4);
             transform: translateY(-2px);
         }
 
@@ -836,7 +838,7 @@
             border: 1px solid var(--border-hover);
             border-radius: var(--radius-xl);
             width: 100%;
-            max-width: 650px;
+            max-width: 680px;
             max-height: 88vh;
             display: flex;
             flex-direction: column;
@@ -1037,7 +1039,7 @@
         }
 
         .toast-notification.success {
-            border-left: 4px solid #10b981;
+            border-left: 4px solid #3ecf8e;
         }
 
         .toast-notification.info {
@@ -1069,7 +1071,7 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-card">
             <img src="static/images/logo.png" alt="Code Brains" class="auth-logo">
-            <h2 class="auth-title">🔐 Private Cloud Database</h2>
+            <h2 class="auth-title">🔐 Supabase Cloud Database</h2>
             <p class="auth-subtitle">Authorized Access Only. Please enter your administrator credentials to proceed.</p>
 
             <div class="auth-error" id="authError">
@@ -1133,14 +1135,14 @@
             
             <div class="db-header">
                 <div class="db-title-area">
-                    <h1>🗄️ Online Cloud Database</h1>
+                    <h1>🗄️ Supabase Cloud Database</h1>
                     <p style="color: var(--text-secondary); margin-top: 4px; font-size: 0.95rem;">
-                        Real-time cloud database storage. Create folders, upload files, and persistently delete across all devices.
+                        Real-time PostgreSQL cloud database powered by Supabase. Create folders, upload files, and delete permanently across all devices.
                     </p>
                 </div>
                 <div class="db-header-badges">
-                    <span class="db-cloud-badge" id="cloudStatusBadge" title="Click to open Cloud Database settings">
-                        <span id="cloudStatusDot">🟢</span> <span id="cloudStatusText">Online Cloud Connected</span>
+                    <span class="db-cloud-badge" id="cloudStatusBadge" title="Click to configure Supabase Connection">
+                        <span id="cloudStatusDot">⚡</span> <span id="cloudStatusText">Supabase Ready</span>
                     </span>
                     <span class="db-user-badge">👤 mastan (Admin)</span>
                     <button class="db-logout-btn" id="dbHeaderLogoutBtn">Logout</button>
@@ -1164,17 +1166,17 @@
                     </div>
                 </div>
                 <div class="db-stat-box">
-                    <span class="db-stat-icon">☁️</span>
+                    <span class="db-stat-icon">⚡</span>
                     <div class="db-stat-info">
-                        <span>Online Cloud DB</span>
-                        <strong style="color: #34d399;" id="statStorage">Connected & Live</strong>
+                        <span>Cloud Database</span>
+                        <strong style="color: #3ecf8e;" id="statStorage">Supabase (PostgreSQL)</strong>
                     </div>
                 </div>
                 <div class="db-stat-box">
-                    <span class="db-stat-icon">⚡</span>
+                    <span class="db-stat-icon">🔄</span>
                     <div class="db-stat-info">
-                        <span>Realtime Sync</span>
-                        <strong style="color: var(--accent-1);" id="statSyncStatus">Active (Auto-Sync)</strong>
+                        <span>Realtime Channel</span>
+                        <strong style="color: var(--accent-1);" id="statSyncStatus">Live Active</strong>
                     </div>
                 </div>
             </div>
@@ -1185,20 +1187,20 @@
                 <!-- Main Action Toolbar -->
                 <div class="db-toolbar">
                     <div class="db-actions">
-                        <button class="db-btn db-btn-primary" id="btnNewFolder" title="Create a new folder in this location">
+                        <button class="db-btn db-btn-primary" id="btnNewFolder" title="Create a new folder">
                             <span>📁</span> New Folder
                         </button>
-                        <button class="db-btn db-btn-success" id="btnUploadFile" title="Upload files directly into this location">
+                        <button class="db-btn db-btn-success" id="btnUploadFile" title="Upload files into current folder">
                             <span>📤</span> Upload Files
                         </button>
                         <button class="db-btn" id="btnNewCode" title="Create a new code or text file">
                             <span>📝</span> New Code File
                         </button>
-                        <button class="db-btn db-btn-cloud" id="btnSyncCloud" title="Sync & Refresh latest changes from Online Cloud DB">
-                            <span>🔄</span> Sync Online DB
+                        <button class="db-btn db-btn-supabase" id="btnSyncCloud" title="Sync & Refresh latest changes from Supabase Cloud DB">
+                            <span>⚡</span> Sync Supabase
                         </button>
-                        <button class="db-btn" id="btnCloudSettings" title="Configure Cloud Database Provider & Credentials">
-                            <span>⚙️</span> Cloud Settings
+                        <button class="db-btn" id="btnCloudSettings" title="Configure Supabase Project URL & Anon Key">
+                            <span>⚙️</span> Supabase Config
                         </button>
                         <button class="db-btn" id="btnExportDb" title="Backup Database to JSON file">
                             <span>📥</span> Backup DB
@@ -1245,7 +1247,7 @@
                     </div>
                 </div>
 
-                <!-- Active Inside-Folder Banner (Displayed only when inside a subfolder) -->
+                <!-- Active Inside-Folder Banner -->
                 <div class="db-folder-banner" id="dbFolderBanner" style="display: none;">
                     <div class="db-folder-info">
                         <div class="db-folder-badge-icon" id="bannerFolderIcon">📁</div>
@@ -1272,7 +1274,7 @@
                         <button class="db-btn" id="bannerRenameBtn" title="Rename this folder">
                             <span>✏️</span> Rename
                         </button>
-                        <button class="db-btn db-item-action-btn delete-btn" id="bannerDeleteBtn" title="Delete this folder and all its files from Cloud DB" style="padding: 9px 14px; border-radius: 50px; font-weight: 600; font-size: 0.84rem;">
+                        <button class="db-btn db-item-action-btn delete-btn" id="bannerDeleteBtn" title="Delete this folder from Supabase DB" style="padding: 9px 14px; border-radius: 50px; font-weight: 600; font-size: 0.84rem;">
                             <span>🗑️</span> Delete Folder
                         </button>
                     </div>
@@ -1285,7 +1287,7 @@
                     <div class="db-dropzone" id="dbDropzone">
                         <span style="font-size: 2.2rem; display: block; margin-bottom: 6px;">📤</span>
                         <p style="font-weight: 700; color: var(--text-primary); font-size: 0.95rem;" id="dropzoneLabel">
-                            Drag & drop files here to upload into current folder & sync to Online Cloud DB
+                            Drag & drop files here to upload into current folder & sync to Supabase Cloud DB
                         </p>
                         <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">
                             Supports Python (.py, .ipynb), PPT (.pptx), PDF, DOCX, ZIP, CSV, Datasets, Images (.png, .jpg)
@@ -1302,7 +1304,7 @@
                     <div class="db-empty-state" id="dbEmptyState" style="display: none;">
                         <div class="db-empty-icon">📭</div>
                         <p style="font-weight: 700; font-size: 1.1rem; color: var(--text-primary);">This folder is currently empty</p>
-                        <p style="font-size: 0.85rem; margin-top: 6px;">Upload project files or create subfolders to sync with Cloud DB.</p>
+                        <p style="font-size: 0.85rem; margin-top: 6px;">Upload project files or create subfolders to sync with Supabase Cloud DB.</p>
                         <div class="db-empty-actions">
                             <button class="db-btn db-btn-success" id="emptyUploadBtn">
                                 <span>📤</span> Upload Files to this Folder
@@ -1325,64 +1327,98 @@
 
     <!-- ═══════════ MODALS ═══════════ -->
 
-    <!-- Cloud Database Settings Modal -->
+    <!-- Supabase & Cloud Database Settings Modal -->
     <div class="db-modal-overlay" id="cloudSettingsModal">
-        <div class="db-modal" style="max-width: 620px;">
+        <div class="db-modal" style="max-width: 700px;">
             <div class="db-modal-header">
-                <h3>☁️ Cloud Database Configuration</h3>
+                <h3>⚡ Supabase Cloud Database Setup</h3>
                 <button class="db-modal-close" data-close="cloudSettingsModal">&times;</button>
             </div>
             <div class="db-modal-body">
                 <div class="db-form-group">
-                    <label>Cloud Database Provider</label>
+                    <label>Database Provider</label>
                     <select id="cloudProviderSelect" class="db-form-select">
-                        <option value="firebase">🔥 Firebase Realtime Database (Recommended)</option>
-                        <option value="supabase">⚡ Supabase REST API</option>
-                        <option value="custom">🌐 Custom REST Cloud Endpoint / Webhook</option>
+                        <option value="supabase">⚡ Supabase (PostgreSQL & Realtime - Recommended)</option>
+                        <option value="firebase">🔥 Firebase Realtime Database</option>
                         <option value="builtin">☁️ Built-in Cloud Sync (Zero Setup)</option>
-                        <option value="local">🗄️ Local Storage Only (Offline Mode)</option>
+                        <option value="local">🗄️ Local Storage Only (Offline)</option>
                     </select>
-                    <div class="db-form-hint">Choose your preferred online database backend for real-time storage & sync.</div>
                 </div>
 
-                <div class="db-form-group" id="cloudUrlGroup">
-                    <label id="cloudUrlLabel">Firebase Database URL / Endpoint</label>
-                    <input type="text" id="cloudUrlInput" class="db-form-input" placeholder="https://your-project-default-rtdb.firebaseio.com/">
-                    <div class="db-form-hint" id="cloudUrlHint">Enter your Firebase Realtime Database URL.</div>
+                <div class="db-form-group" id="supabaseFields">
+                    <label>Supabase Project URL</label>
+                    <input type="text" id="supabaseUrlInput" class="db-form-input" placeholder="https://xyzcompany.supabase.co">
+                    <div class="db-form-hint">Find in Supabase Dashboard → Settings → API → Project URL</div>
                 </div>
 
-                <div class="db-form-group" id="cloudKeyGroup">
-                    <label id="cloudKeyLabel">API Key / Secret Token (Optional)</label>
-                    <input type="password" id="cloudKeyInput" class="db-form-input" placeholder="Enter auth key or secret (if protected)">
+                <div class="db-form-group" id="supabaseKeyGroup">
+                    <label>Supabase Anon / Public Key (or Service Key)</label>
+                    <input type="password" id="supabaseKeyInput" class="db-form-input" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                    <div class="db-form-hint">Find in Supabase Dashboard → Settings → API → anon / public key</div>
                 </div>
 
-                <div class="db-form-group">
-                    <label>Database Path / Namespace</label>
-                    <input type="text" id="cloudPathInput" class="db-form-input" value="codebrains_db">
-                    <div class="db-form-hint">The root node/table in your cloud database where files & folders are saved.</div>
+                <!-- 1-Click SQL Schema Helper Box -->
+                <div style="background: rgba(62, 207, 142, 0.05); border: 1px solid rgba(62, 207, 142, 0.25); padding: 16px; border-radius: var(--radius-sm); margin-top: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-size: 0.85rem; font-weight: 800; color: #3ecf8e;">📋 Supabase SQL Schema (Run in SQL Editor):</span>
+                        <button type="button" class="db-btn db-btn-supabase" id="btnCopySqlSchema" style="padding: 4px 12px; font-size: 0.76rem;">
+                            Copy SQL Code
+                        </button>
+                    </div>
+                    <div class="code-preview-box" id="sqlSchemaPreview" style="max-height: 140px; font-size: 0.74rem; background: #0b1510; border-color: rgba(62, 207, 142, 0.2);">-- 1. Create Folders Table
+create table if not exists cb_folders (
+    id text primary key,
+    parent_id text default 'root',
+    name text not null,
+    category text default 'General',
+    date text,
+    created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 2. Create Files Table
+create table if not exists cb_files (
+    id text primary key,
+    folder_id text default 'root',
+    name text not null,
+    type text default 'code',
+    size text,
+    date text,
+    content text,
+    created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+-- 3. Enable Public Access & Realtime Policies
+alter table cb_folders enable row level security;
+alter table cb_files enable row level security;
+
+create policy "Allow all on cb_folders" on cb_folders for all using (true) with check (true);
+create policy "Allow all on cb_files" on cb_files for all using (true) with check (true);
+
+alter publication supabase_realtime add table cb_folders;
+alter publication supabase_realtime add table cb_files;</div>
                 </div>
 
                 <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-sm); margin-top: 16px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
                         <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary);">⚡ Connection Status:</span>
-                        <span id="cloudTestStatus" style="font-size: 0.82rem; font-weight: 700; color: #34d399;">Ready</span>
+                        <span id="cloudTestStatus" style="font-size: 0.82rem; font-weight: 700; color: #3ecf8e;">Ready</span>
                     </div>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         <button type="button" class="db-btn" id="btnTestCloudConnection" style="padding: 6px 14px; font-size: 0.8rem;">
                             🔌 Test Connection
                         </button>
                         <button type="button" class="db-btn" id="btnPushLocalToCloud" style="padding: 6px 14px; font-size: 0.8rem;">
-                            ⬆️ Push All Local Data to Cloud
+                            ⬆️ Push All Local Data to Supabase
                         </button>
                         <button type="button" class="db-btn" id="btnPullCloudToLocal" style="padding: 6px 14px; font-size: 0.8rem;">
-                            ⬇️ Pull Fresh Data from Cloud
+                            ⬇️ Pull Fresh Data from Supabase
                         </button>
                     </div>
                 </div>
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="cloudSettingsModal">Cancel</button>
-                <button class="db-btn db-btn-primary" id="btnSaveCloudSettings">Save Cloud Configuration</button>
+                <button class="db-btn db-btn-supabase" id="btnSaveCloudSettings">Save & Connect Supabase</button>
             </div>
         </div>
     </div>
@@ -1400,7 +1436,6 @@
                     <select id="folderParentSelect" class="db-form-select">
                         <option value="root">🏠 Root (Main Directory)</option>
                     </select>
-                    <div class="db-form-hint">Choose where this folder will be created.</div>
                 </div>
                 <div class="db-form-group">
                     <label>Folder Name</label>
@@ -1423,7 +1458,7 @@
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="folderModal">Cancel</button>
-                <button class="db-btn db-btn-primary" id="btnConfirmFolder">Create & Save Online</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmFolder">Create & Save in Supabase</button>
             </div>
         </div>
     </div>
@@ -1432,7 +1467,7 @@
     <div class="db-modal-overlay" id="uploadModal">
         <div class="db-modal" style="max-width: 680px;">
             <div class="db-modal-header">
-                <h3>📤 Upload Files to Online Database</h3>
+                <h3>📤 Upload Files to Supabase Database</h3>
                 <button class="db-modal-close" data-close="uploadModal">&times;</button>
             </div>
             <div class="db-modal-body">
@@ -1441,7 +1476,7 @@
                     <select id="uploadFolderSelect" class="db-form-select">
                         <option value="root">🏠 Root (Main Directory)</option>
                     </select>
-                    <div class="db-form-hint">Files will be saved into the selected folder in Online Cloud DB.</div>
+                    <div class="db-form-hint">Files will be saved into the selected folder in Supabase.</div>
                 </div>
 
                 <div class="db-form-group">
@@ -1474,7 +1509,7 @@
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="uploadModal">Cancel</button>
-                <button class="db-btn db-btn-success" id="btnConfirmUpload" disabled>Upload & Save Online</button>
+                <button class="db-btn db-btn-success" id="btnConfirmUpload" disabled>Upload & Save in Supabase</button>
             </div>
         </div>
     </div>
@@ -1514,7 +1549,7 @@
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="codeModal">Cancel</button>
-                <button class="db-btn db-btn-primary" id="btnConfirmCode">Save Online</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmCode">Save in Supabase</button>
             </div>
         </div>
     </div>
@@ -1534,7 +1569,7 @@
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="renameModal">Cancel</button>
-                <button class="db-btn db-btn-primary" id="btnConfirmRename">Save & Sync Online</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmRename">Save & Sync Supabase</button>
             </div>
         </div>
     </div>
@@ -1557,7 +1592,7 @@
             </div>
             <div class="db-modal-footer">
                 <button class="db-btn" data-close="moveModal">Cancel</button>
-                <button class="db-btn db-btn-primary" id="btnConfirmMove">Move & Sync Online</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmMove">Move & Sync Supabase</button>
             </div>
         </div>
     </div>
@@ -1582,7 +1617,7 @@
         </div>
     </div>
 
-    <!-- ═══════════ JAVASCRIPT AUTHENTICATION & CLOUD DATABASE ENGINE ═══════════ -->
+    <!-- ═══════════ JAVASCRIPT SUPABASE & CLOUD DATABASE ENGINE ═══════════ -->
     <script>
         // ── Security Credentials ──
         const AUTH_CONFIG = {
@@ -1599,14 +1634,12 @@
         const authPassword = document.getElementById('authPassword');
         const authPwdToggle = document.getElementById('authPwdToggle');
 
-        // Password visibility toggle
         authPwdToggle.addEventListener('click', () => {
             const isPassword = authPassword.type === 'password';
             authPassword.type = isPassword ? 'text' : 'password';
             authPwdToggle.textContent = isPassword ? '🙈' : '👁️';
         });
 
-        // Authentication state
         function checkAuth() {
             const savedSession = sessionStorage.getItem(AUTH_CONFIG.sessionKey) || localStorage.getItem(AUTH_CONFIG.sessionKey);
             if (savedSession === AUTH_CONFIG.validUser) {
@@ -1620,7 +1653,7 @@
             authOverlay.style.display = 'none';
             dbMainSection.style.display = 'block';
             document.getElementById('navLogoutBtn').style.display = 'inline-block';
-            initDatabaseAndCloud();
+            initDatabaseAndSupabase();
         }
 
         function lockDashboard() {
@@ -1664,7 +1697,7 @@
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = `toast-notification ${type}`;
-            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            const icon = type === 'success' ? '⚡' : type === 'error' ? '❌' : 'ℹ️';
             toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => {
@@ -1675,32 +1708,64 @@
             }, 3200);
         }
 
-        // ── Cloud Database Configuration & State ──
-        const CLOUD_CONFIG_KEY = 'codebrains_cloud_config_v2';
+        // ── Supabase & Cloud Database Configuration ──
+        const SUPABASE_CONFIG_KEY = 'codebrains_supabase_config_v1';
         
         let cloudConfig = {
-            provider: 'firebase', // 'firebase' | 'supabase' | 'custom' | 'builtin' | 'local'
-            url: 'https://code-brains-default-rtdb.firebaseio.com/',
-            key: '',
-            path: 'codebrains_db'
+            provider: 'supabase', // 'supabase' | 'firebase' | 'builtin' | 'local'
+            supabaseUrl: 'https://xyzcompany.supabase.co',
+            supabaseKey: '',
+            firebaseUrl: 'https://code-brains-default-rtdb.firebaseio.com/'
         };
 
         function loadCloudConfig() {
-            const saved = localStorage.getItem(CLOUD_CONFIG_KEY);
+            const saved = localStorage.getItem(SUPABASE_CONFIG_KEY);
             if (saved) {
                 try { cloudConfig = { ...cloudConfig, ...JSON.parse(saved) }; } catch (e) {}
             }
         }
 
         function saveCloudConfig() {
-            localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloudConfig));
+            localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify(cloudConfig));
         }
         loadCloudConfig();
 
-        // ── Cloud Sync Engine ──
-        const CloudEngine = {
-            isSyncing: false,
+        // ── Supabase Client Instance ──
+        let supabaseClient = null;
 
+        function getSupabaseClient() {
+            if (supabaseClient) return supabaseClient;
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey && window.supabase) {
+                try {
+                    supabaseClient = window.supabase.createClient(cloudConfig.supabaseUrl, cloudConfig.supabaseKey);
+                    setupSupabaseRealtime(supabaseClient);
+                    return supabaseClient;
+                } catch (err) {
+                    console.warn("Supabase init error:", err);
+                    return null;
+                }
+            }
+            return null;
+        }
+
+        function setupSupabaseRealtime(client) {
+            try {
+                client
+                    .channel('codebrains-realtime-changes')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cb_folders' }, () => {
+                        syncFromSupabase(false);
+                    })
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'cb_files' }, () => {
+                        syncFromSupabase(false);
+                    })
+                    .subscribe();
+            } catch (e) {
+                console.warn("Supabase realtime subscription failed:", e);
+            }
+        }
+
+        // ── Cloud & Supabase Engine ──
+        const SupabaseEngine = {
             setSyncState(state, message) {
                 const badge = document.getElementById('cloudStatusBadge');
                 const dot = document.getElementById('cloudStatusDot');
@@ -1711,179 +1776,165 @@
                 if (state === 'syncing') {
                     badge.className = 'db-cloud-badge syncing';
                     dot.textContent = '🔄';
-                    text.textContent = message || 'Syncing with Cloud DB...';
+                    text.textContent = message || 'Syncing with Supabase...';
                     if (statSync) statSync.textContent = 'Syncing...';
                 } else if (state === 'connected') {
                     badge.className = 'db-cloud-badge';
-                    dot.textContent = '🟢';
-                    text.textContent = message || 'Online Cloud Connected';
+                    dot.textContent = '⚡';
+                    text.textContent = message || 'Supabase Connected';
                     if (statSync) statSync.textContent = 'Active (Live Sync)';
-                    if (statStorage) statStorage.textContent = 'Connected & Live';
+                    if (statStorage) statStorage.textContent = 'Supabase (PostgreSQL)';
                 } else if (state === 'offline') {
                     badge.className = 'db-cloud-badge offline';
                     dot.textContent = '🔴';
                     text.textContent = message || 'Local Mode (Offline)';
                     if (statSync) statSync.textContent = 'Local Only';
-                    if (statStorage) statStorage.textContent = 'Local Storage';
+                    if (statStorage) statStorage.textContent = 'Local Storage (IndexedDB)';
                 }
             },
 
-            getEndpointUrl(subpath = '') {
-                if (cloudConfig.provider === 'local') return null;
-                let baseUrl = (cloudConfig.url || '').trim();
-                if (!baseUrl) return null;
-                if (!baseUrl.endsWith('/')) baseUrl += '/';
-                const namespace = cloudConfig.path || 'codebrains_db';
-
-                if (cloudConfig.provider === 'firebase' || cloudConfig.provider === 'builtin') {
-                    // Firebase REST API format: https://<project>.firebaseio.com/codebrains_db/<subpath>.json
-                    const pathPart = subpath ? `${namespace}/${subpath}` : namespace;
-                    let url = `${baseUrl}${pathPart}.json`;
-                    if (cloudConfig.key) url += `?auth=${encodeURIComponent(cloudConfig.key)}`;
-                    return url;
-                } else {
-                    return `${baseUrl}${namespace}${subpath ? '/' + subpath : ''}`;
-                }
-            },
-
-            // Fetch entire database from cloud
             async fetchAll() {
-                const url = this.getEndpointUrl();
-                if (!url) return null;
+                const sb = getSupabaseClient();
+                if (!sb) return null;
 
                 try {
-                    this.setSyncState('syncing', 'Fetching from Cloud DB...');
-                    const headers = {};
-                    if (cloudConfig.provider === 'supabase' && cloudConfig.key) {
-                        headers['apikey'] = cloudConfig.key;
-                        headers['Authorization'] = `Bearer ${cloudConfig.key}`;
+                    this.setSyncState('syncing', 'Fetching from Supabase...');
+                    const [resFolders, resFiles] = await Promise.all([
+                        sb.from('cb_folders').select('*'),
+                        sb.from('cb_files').select('*')
+                    ]);
+
+                    if (resFolders.error || resFiles.error) {
+                        throw new Error(resFolders.error?.message || resFiles.error?.message);
                     }
 
-                    const res = await fetch(url, { method: 'GET', headers });
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const data = await res.json();
-                    this.setSyncState('connected', 'Online Cloud Synced');
-                    return data;
+                    const folders = (resFolders.data || []).map(f => ({
+                        id: f.id,
+                        parentId: f.parent_id,
+                        name: f.name,
+                        category: f.category,
+                        date: f.date
+                    }));
+
+                    const files = (resFiles.data || []).map(f => ({
+                        id: f.id,
+                        folderId: f.folder_id,
+                        name: f.name,
+                        type: f.type,
+                        size: f.size,
+                        date: f.date,
+                        content: f.content
+                    }));
+
+                    this.setSyncState('connected', 'Supabase Connected');
+                    return { folders, files };
                 } catch (err) {
-                    console.warn("Cloud DB fetch error:", err);
-                    this.setSyncState('offline', 'Cloud Offline / Local Cache');
+                    console.warn("Supabase fetch error:", err);
+                    this.setSyncState('offline', 'Supabase Setup Required');
                     return null;
                 }
             },
 
-            // Save or Update entire database state in cloud
-            async pushAll(dbObj) {
-                const url = this.getEndpointUrl();
-                if (!url) return false;
-
-                try {
-                    this.setSyncState('syncing', 'Saving to Cloud DB...');
-                    const headers = { 'Content-Type': 'application/json' };
-                    if (cloudConfig.provider === 'supabase' && cloudConfig.key) {
-                        headers['apikey'] = cloudConfig.key;
-                        headers['Authorization'] = `Bearer ${cloudConfig.key}`;
-                    }
-
-                    // Format payload for Firebase (objects keyed by id or arrays)
-                    const payload = {
-                        folders: dbObj.folders,
-                        files: dbObj.files,
-                        lastUpdated: new Date().toISOString()
-                    };
-
-                    const res = await fetch(url, {
-                        method: 'PUT',
-                        headers,
-                        body: JSON.stringify(payload)
-                    });
-
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    this.setSyncState('connected', 'Saved to Cloud Database');
-                    return true;
-                } catch (err) {
-                    console.warn("Cloud DB push error:", err);
-                    this.setSyncState('offline', 'Cloud Sync Error');
-                    return false;
-                }
-            },
-
-            // Save individual folder to Cloud DB
             async saveFolder(folder) {
-                if (cloudConfig.provider === 'local') return;
-                const url = this.getEndpointUrl(`folders/${folder.id}`);
-                if (!url) {
-                    this.pushAll(db);
-                    return;
-                }
-
+                const sb = getSupabaseClient();
+                if (!sb) return;
                 try {
-                    this.setSyncState('syncing', 'Saving folder to Cloud...');
-                    const headers = { 'Content-Type': 'application/json' };
-                    await fetch(url, {
-                        method: 'PUT',
-                        headers,
-                        body: JSON.stringify(folder)
+                    this.setSyncState('syncing', 'Saving folder to Supabase...');
+                    await sb.from('cb_folders').upsert({
+                        id: folder.id,
+                        parent_id: folder.parentId,
+                        name: folder.name,
+                        category: folder.category || 'General',
+                        date: folder.date || new Date().toISOString().split('T')[0]
                     });
                     this.setSyncState('connected');
                 } catch (e) {
-                    this.pushAll(db);
+                    console.warn("Supabase folder save error:", e);
                 }
             },
 
-            // Permanently delete folder from Cloud DB
             async deleteFolder(folderId) {
-                if (cloudConfig.provider === 'local') return;
-                const url = this.getEndpointUrl(`folders/${folderId}`);
+                const sb = getSupabaseClient();
+                if (!sb) return;
                 try {
-                    this.setSyncState('syncing', 'Deleting from Cloud DB...');
-                    if (url) {
-                        await fetch(url, { method: 'DELETE' });
-                    }
-                    // Also delete any child items by pushing updated sync
-                    await this.pushAll(db);
-                    this.setSyncState('connected', 'Permanently Deleted from Cloud');
+                    this.setSyncState('syncing', 'Deleting from Supabase...');
+                    await Promise.all([
+                        sb.from('cb_folders').delete().eq('id', folderId),
+                        sb.from('cb_files').delete().eq('folder_id', folderId)
+                    ]);
+                    this.setSyncState('connected', 'Deleted from Supabase');
                 } catch (e) {
-                    console.warn("Cloud delete error, fallback full sync:", e);
-                    this.pushAll(db);
+                    console.warn("Supabase folder delete error:", e);
                 }
             },
 
-            // Save individual file to Cloud DB
             async saveFile(file) {
-                if (cloudConfig.provider === 'local') return;
-                const url = this.getEndpointUrl(`files/${file.id}`);
-                if (!url) {
-                    this.pushAll(db);
-                    return;
-                }
-
+                const sb = getSupabaseClient();
+                if (!sb) return;
                 try {
-                    this.setSyncState('syncing', 'Uploading to Cloud DB...');
-                    const headers = { 'Content-Type': 'application/json' };
-                    await fetch(url, {
-                        method: 'PUT',
-                        headers,
-                        body: JSON.stringify(file)
+                    this.setSyncState('syncing', 'Uploading to Supabase...');
+                    await sb.from('cb_files').upsert({
+                        id: file.id,
+                        folder_id: file.folderId,
+                        name: file.name,
+                        type: file.type || 'code',
+                        size: file.size || '1.0 KB',
+                        date: file.date || new Date().toISOString().split('T')[0],
+                        content: file.content || ''
                     });
                     this.setSyncState('connected');
                 } catch (e) {
-                    this.pushAll(db);
+                    console.warn("Supabase file save error:", e);
                 }
             },
 
-            // Permanently delete file from Cloud DB
             async deleteFile(fileId) {
-                if (cloudConfig.provider === 'local') return;
-                const url = this.getEndpointUrl(`files/${fileId}`);
+                const sb = getSupabaseClient();
+                if (!sb) return;
                 try {
-                    this.setSyncState('syncing', 'Deleting file from Cloud DB...');
-                    if (url) {
-                        await fetch(url, { method: 'DELETE' });
-                    }
-                    await this.pushAll(db);
-                    this.setSyncState('connected', 'Permanently Deleted from Cloud');
+                    this.setSyncState('syncing', 'Deleting from Supabase...');
+                    await sb.from('cb_files').delete().eq('id', fileId);
+                    this.setSyncState('connected', 'Deleted from Supabase');
                 } catch (e) {
-                    this.pushAll(db);
+                    console.warn("Supabase file delete error:", e);
+                }
+            },
+
+            async pushAll(dbObj) {
+                const sb = getSupabaseClient();
+                if (!sb) return false;
+                try {
+                    this.setSyncState('syncing', 'Pushing to Supabase...');
+                    const foldersPayload = dbObj.folders.map(f => ({
+                        id: f.id,
+                        parent_id: f.parentId,
+                        name: f.name,
+                        category: f.category || 'General',
+                        date: f.date || '2026-08-26'
+                    }));
+
+                    const filesPayload = dbObj.files.map(f => ({
+                        id: f.id,
+                        folder_id: f.folderId,
+                        name: f.name,
+                        type: f.type || 'code',
+                        size: f.size || '1.0 KB',
+                        date: f.date || '2026-08-26',
+                        content: f.content || ''
+                    }));
+
+                    if (foldersPayload.length > 0) {
+                        await sb.from('cb_folders').upsert(foldersPayload);
+                    }
+                    if (filesPayload.length > 0) {
+                        await sb.from('cb_files').upsert(filesPayload);
+                    }
+
+                    this.setSyncState('connected', 'Synced with Supabase');
+                    return true;
+                } catch (e) {
+                    console.warn("Push all to Supabase failed:", e);
+                    return false;
                 }
             }
         };
@@ -1982,16 +2033,14 @@
         let searchQuery = '';
         let viewMode = 'grid';
 
-        // ── IndexedDB & Local Cache ──
+        // ── IndexedDB & Local Storage Cache ──
         const DB_NAME = 'CodeBrainsDB_v2';
         const DB_VERSION = 1;
         let idb = null;
 
-        async function initDatabaseAndCloud() {
-            // 1. Initialize local cache first for instant rendering
+        async function initDatabaseAndSupabase() {
             initIDB(() => {
-                // 2. Fetch latest state from Online Cloud Database
-                syncFromCloud();
+                syncFromSupabase(true);
             });
         }
 
@@ -2086,39 +2135,21 @@
             updateStats();
         }
 
-        // ── Cloud Sync Pull Handler ──
-        async function syncFromCloud() {
-            if (cloudConfig.provider === 'local') return;
-
-            const cloudData = await CloudEngine.fetchAll();
-            if (cloudData && (cloudData.folders || cloudData.files)) {
-                // Convert object mapping to array if Firebase returns object keyed by id
-                let cloudFolders = [];
-                if (Array.isArray(cloudData.folders)) {
-                    cloudFolders = cloudData.folders.filter(Boolean);
-                } else if (typeof cloudData.folders === 'object' && cloudData.folders !== null) {
-                    cloudFolders = Object.values(cloudData.folders);
-                }
-
-                let cloudFiles = [];
-                if (Array.isArray(cloudData.files)) {
-                    cloudFiles = cloudData.files.filter(Boolean);
-                } else if (typeof cloudData.files === 'object' && cloudData.files !== null) {
-                    cloudFiles = Object.values(cloudData.files);
-                }
-
-                db.folders = cloudFolders;
-                db.files = cloudFiles;
+        async function syncFromSupabase(showToastAlert = false) {
+            const remoteData = await SupabaseEngine.fetchAll();
+            if (remoteData && (remoteData.folders.length > 0 || remoteData.files.length > 0)) {
+                db.folders = remoteData.folders;
+                db.files = remoteData.files;
                 persistLocally();
                 renderExplorer();
-                showToast("Synced with Online Cloud Database", "success");
-            } else if (cloudData === null && cloudConfig.provider !== 'local') {
-                // First time on new cloud store: push initial local data to seed cloud DB
-                await CloudEngine.pushAll(db);
+                if (showToastAlert) showToast("Synced with Supabase Cloud Database", "success");
+            } else if (remoteData && remoteData.folders.length === 0 && remoteData.files.length === 0) {
+                // Seed Supabase with initial data
+                await SupabaseEngine.pushAll(db);
+                if (showToastAlert) showToast("Supabase Database Initialized", "success");
             }
         }
 
-        // ── Helper to detect icon and category ──
         function getFileDetails(name, explicitType) {
             const ext = name.split('.').pop().toLowerCase();
             let icon = '📄';
@@ -2151,7 +2182,6 @@
             return { icon, category };
         }
 
-        // ── Populate Folder Select Dropdowns in Modals ──
         function updateFolderDropdowns() {
             const selects = [
                 document.getElementById('folderParentSelect'),
@@ -2226,9 +2256,9 @@
 
             const activeFolderObj = db.folders.find(f => f.id === currentFolderId);
             if (currentFolderId === 'root') {
-                dropzoneLabel.textContent = `Drag & drop files here to upload into Root Directory & sync to Online Cloud DB`;
+                dropzoneLabel.textContent = `Drag & drop files here to upload into Root Directory & sync to Supabase`;
             } else {
-                dropzoneLabel.textContent = `Drag & drop files here to upload directly into "${activeFolderObj ? activeFolderObj.name : 'this folder'}" & sync to Online Cloud DB`;
+                dropzoneLabel.textContent = `Drag & drop files here to upload directly into "${activeFolderObj ? activeFolderObj.name : 'this folder'}" & sync to Supabase`;
             }
 
             if (totalItems === 0) {
@@ -2251,7 +2281,7 @@
                             <div class="db-item-card-actions">
                                 <button class="db-item-action-btn" onclick="event.stopPropagation(); openUploadModalForFolder('${folder.id}')" title="Upload files directly into this folder">📤</button>
                                 <button class="db-item-action-btn" onclick="event.stopPropagation(); promptRename('folder', '${folder.id}')" title="Rename Folder">✏️</button>
-                                <button class="db-item-action-btn delete-btn" onclick="event.stopPropagation(); deleteFolder('${folder.id}')" title="Delete Folder from Online Database">🗑️</button>
+                                <button class="db-item-action-btn delete-btn" onclick="event.stopPropagation(); deleteFolder('${folder.id}')" title="Permanently Delete Folder from Supabase">🗑️</button>
                             </div>
                         </div>
                         <div class="db-item-name">${folder.name}</div>
@@ -2283,7 +2313,7 @@
                                 <button class="db-item-action-btn" onclick="event.stopPropagation(); downloadFileById('${file.id}')" title="Download File">📥</button>
                                 <button class="db-item-action-btn" onclick="event.stopPropagation(); openMoveModal('${file.id}')" title="Move to Folder">🔀</button>
                                 <button class="db-item-action-btn" onclick="event.stopPropagation(); promptRename('file', '${file.id}')" title="Rename File">✏️</button>
-                                <button class="db-item-action-btn delete-btn" onclick="event.stopPropagation(); deleteFile('${file.id}')" title="Permanently Delete from Online Database">🗑️</button>
+                                <button class="db-item-action-btn delete-btn" onclick="event.stopPropagation(); deleteFile('${file.id}')" title="Permanently Delete from Supabase">🗑️</button>
                             </div>
                         </div>
                         <div class="db-item-name">${file.name}</div>
@@ -2304,7 +2334,6 @@
             updateStats();
         }
 
-        // ── Render Breadcrumbs & In-Folder Banner ──
         function renderBreadcrumbsAndBanner() {
             const bc = document.getElementById('dbBreadcrumbs');
             const banner = document.getElementById('dbFolderBanner');
@@ -2369,17 +2398,16 @@
             }
         });
 
-        // ── Update Statistics ──
         function updateStats() {
             document.getElementById('statFolders').textContent = db.folders.length;
             document.getElementById('statFiles').textContent = db.files.length;
         }
 
-        // ── Delete Actions (Permanently removes from Online Cloud DB) ──
+        // ── Delete Actions (Permanently removes from Supabase Cloud DB) ──
         window.deleteFolder = async function(id) {
             const folder = db.folders.find(f => f.id === id);
             const folderName = folder ? folder.name : 'this folder';
-            if (confirm(`Are you sure you want to PERMANENTLY delete folder "${folderName}" and all its contents from Online Cloud Database?`)) {
+            if (confirm(`Are you sure you want to PERMANENTLY delete folder "${folderName}" and all its contents from Supabase Cloud Database?`)) {
                 const toDelete = [id];
                 function collectChildren(pId) {
                     db.folders.filter(f => f.parentId === pId).forEach(child => {
@@ -2399,13 +2427,11 @@
                 persistLocally();
                 renderExplorer();
 
-                // Delete from Online Cloud Database
-                await CloudEngine.deleteFolder(id);
-                showToast(`Folder "${folderName}" permanently deleted from Cloud DB`, "info");
+                await SupabaseEngine.deleteFolder(id);
+                showToast(`Folder "${folderName}" permanently deleted from Supabase`, "info");
             }
         };
 
-        // Banner delete button
         document.getElementById('bannerDeleteBtn').addEventListener('click', () => {
             if (currentFolderId !== 'root') {
                 deleteFolder(currentFolderId);
@@ -2415,14 +2441,13 @@
         window.deleteFile = async function(id) {
             const file = db.files.find(f => f.id === id);
             const fileName = file ? file.name : 'this file';
-            if (confirm(`PERMANENTLY delete file "${fileName}" from Online Cloud Database?`)) {
+            if (confirm(`PERMANENTLY delete file "${fileName}" from Supabase Cloud Database?`)) {
                 db.files = db.files.filter(f => f.id !== id);
                 persistLocally();
                 renderExplorer();
 
-                // Delete from Online Cloud Database
-                await CloudEngine.deleteFile(id);
-                showToast(`File "${fileName}" permanently deleted from Cloud DB`, "info");
+                await SupabaseEngine.deleteFile(id);
+                showToast(`File "${fileName}" permanently deleted from Supabase`, "info");
             }
         };
 
@@ -2464,14 +2489,13 @@
             document.getElementById('renameModal').classList.remove('active');
             renderExplorer();
 
-            // Sync update to Cloud DB
             if (itemToRename.type === 'folder' && targetItem) {
-                await CloudEngine.saveFolder(targetItem);
+                await SupabaseEngine.saveFolder(targetItem);
             } else if (targetItem) {
-                await CloudEngine.saveFile(targetItem);
+                await SupabaseEngine.saveFile(targetItem);
             }
 
-            showToast("Renamed & synced online", "success");
+            showToast("Renamed & synced in Supabase", "success");
         });
 
         // ── Move Item Actions ──
@@ -2498,9 +2522,9 @@
                 document.getElementById('moveModal').classList.remove('active');
                 renderExplorer();
 
-                await CloudEngine.saveFile(file);
+                await SupabaseEngine.saveFile(file);
                 const destObj = db.folders.find(f => f.id === targetFolder);
-                showToast(`Moved "${file.name}" to ${destObj ? destObj.name : 'Root'} & synced online`, "success");
+                showToast(`Moved "${file.name}" to ${destObj ? destObj.name : 'Root'} & synced in Supabase`, "success");
             }
         });
 
@@ -2577,7 +2601,6 @@
             }
         });
 
-        // ── Modal Handling & Close buttons ──
         document.querySelectorAll('[data-close]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const target = btn.dataset.close;
@@ -2618,9 +2641,8 @@
             document.getElementById('folderModal').classList.remove('active');
             renderExplorer();
 
-            // Save to Online Cloud Database
-            await CloudEngine.saveFolder(newFolder);
-            showToast(`Folder "${name}" saved to Online Cloud DB`, "success");
+            await SupabaseEngine.saveFolder(newFolder);
+            showToast(`Folder "${name}" saved to Supabase`, "success");
         });
 
         // ── Upload Files Modal Triggers ──
@@ -2707,7 +2729,7 @@
 
             const btn = document.getElementById('btnConfirmUpload');
             btn.disabled = true;
-            btn.textContent = 'Uploading to Cloud...';
+            btn.textContent = 'Uploading to Supabase...';
 
             for (const file of stagedFiles) {
                 await processAndSaveFile(file, targetFolder, categoryPreference);
@@ -2715,12 +2737,11 @@
 
             persistLocally();
             document.getElementById('uploadModal').classList.remove('active');
-            btn.textContent = 'Upload & Save Online';
+            btn.textContent = 'Upload & Save in Supabase';
             stagedFiles = [];
             renderExplorer();
 
-            const targetObj = db.folders.find(f => f.id === targetFolder);
-            showToast(`Uploaded & synced to Online Cloud DB`, "success");
+            showToast(`Uploaded & synced to Supabase Cloud DB`, "success");
         });
 
         function processAndSaveFile(file, folderId, explicitCategory) {
@@ -2738,7 +2759,7 @@
                         content: e.target.result
                     };
                     db.files.push(newFile);
-                    await CloudEngine.saveFile(newFile);
+                    await SupabaseEngine.saveFile(newFile);
                     resolve();
                 };
 
@@ -2763,7 +2784,7 @@
                 persistLocally();
                 renderExplorer();
                 const folderName = currentFolderId === 'root' ? 'Root' : (db.folders.find(f => f.id === currentFolderId)?.name || 'Folder');
-                showToast(`Uploaded ${this.files.length} file(s) to ${folderName} & synced to Cloud DB`, "success");
+                showToast(`Uploaded ${this.files.length} file(s) to ${folderName} & synced to Supabase`, "success");
                 this.value = '';
             }
         });
@@ -2780,7 +2801,7 @@
                 persistLocally();
                 renderExplorer();
                 const folderName = currentFolderId === 'root' ? 'Root' : (db.folders.find(f => f.id === currentFolderId)?.name || 'Folder');
-                showToast(`Uploaded ${e.dataTransfer.files.length} file(s) to ${folderName} & synced to Cloud DB`, "success");
+                showToast(`Uploaded ${e.dataTransfer.files.length} file(s) to ${folderName} & synced to Supabase`, "success");
             }
         });
 
@@ -2912,8 +2933,8 @@ if __name__ == "__main__":
             document.getElementById('codeModal').classList.remove('active');
             renderExplorer();
 
-            await CloudEngine.saveFile(newFile);
-            showToast(`Saved code file "${name}" to Cloud DB`, "success");
+            await SupabaseEngine.saveFile(newFile);
+            showToast(`Saved code file "${name}" in Supabase`, "success");
         });
 
         // ── Banner Rename Folder Button ──
@@ -2923,80 +2944,67 @@ if __name__ == "__main__":
             }
         });
 
-        // ── Cloud Database Settings Modal & Actions ──
+        // ── Supabase Settings Modal & Actions ──
         function openCloudSettingsModal() {
-            document.getElementById('cloudProviderSelect').value = cloudConfig.provider || 'firebase';
-            document.getElementById('cloudUrlInput').value = cloudConfig.url || '';
-            document.getElementById('cloudKeyInput').value = cloudConfig.key || '';
-            document.getElementById('cloudPathInput').value = cloudConfig.path || 'codebrains_db';
-            updateCloudSettingsFormVisibility();
+            document.getElementById('cloudProviderSelect').value = cloudConfig.provider || 'supabase';
+            document.getElementById('supabaseUrlInput').value = cloudConfig.supabaseUrl || '';
+            document.getElementById('supabaseKeyInput').value = cloudConfig.supabaseKey || '';
             document.getElementById('cloudSettingsModal').classList.add('active');
         }
 
-        function updateCloudSettingsFormVisibility() {
-            const provider = document.getElementById('cloudProviderSelect').value;
-            const urlGroup = document.getElementById('cloudUrlGroup');
-            const keyGroup = document.getElementById('cloudKeyGroup');
-            const urlLabel = document.getElementById('cloudUrlLabel');
-            const urlHint = document.getElementById('cloudUrlHint');
-
-            if (provider === 'local') {
-                urlGroup.style.display = 'none';
-                keyGroup.style.display = 'none';
-            } else if (provider === 'firebase' || provider === 'builtin') {
-                urlGroup.style.display = 'block';
-                keyGroup.style.display = 'block';
-                urlLabel.textContent = 'Firebase Realtime Database URL';
-                urlHint.textContent = 'e.g. https://your-project-default-rtdb.firebaseio.com/';
-            } else if (provider === 'supabase') {
-                urlGroup.style.display = 'block';
-                keyGroup.style.display = 'block';
-                urlLabel.textContent = 'Supabase REST Endpoint URL';
-                urlHint.textContent = 'e.g. https://your-project.supabase.co/rest/v1/';
-            } else {
-                urlGroup.style.display = 'block';
-                keyGroup.style.display = 'block';
-                urlLabel.textContent = 'Custom Cloud Endpoint URL';
-                urlHint.textContent = 'e.g. https://api.yourdomain.com/v1/database';
-            }
-        }
-
-        document.getElementById('cloudProviderSelect').addEventListener('change', updateCloudSettingsFormVisibility);
         document.getElementById('btnCloudSettings').addEventListener('click', openCloudSettingsModal);
         document.getElementById('cloudStatusBadge').addEventListener('click', openCloudSettingsModal);
 
         document.getElementById('btnSaveCloudSettings').addEventListener('click', async () => {
             cloudConfig.provider = document.getElementById('cloudProviderSelect').value;
-            cloudConfig.url = document.getElementById('cloudUrlInput').value.trim();
-            cloudConfig.key = document.getElementById('cloudKeyInput').value.trim();
-            cloudConfig.path = document.getElementById('cloudPathInput').value.trim() || 'codebrains_db';
+            cloudConfig.supabaseUrl = document.getElementById('supabaseUrlInput').value.trim();
+            cloudConfig.supabaseKey = document.getElementById('supabaseKeyInput').value.trim();
             saveCloudConfig();
 
+            supabaseClient = null; // Reset client with new credentials
             document.getElementById('cloudSettingsModal').classList.remove('active');
-            showToast("Cloud configuration saved", "success");
-            await syncFromCloud();
+            showToast("Supabase configuration saved", "success");
+            await syncFromSupabase(true);
         });
 
+        // Copy SQL Schema Button
+        document.getElementById('btnCopySqlSchema').addEventListener('click', () => {
+            const sqlText = document.getElementById('sqlSchemaPreview').textContent;
+            navigator.clipboard.writeText(sqlText).then(() => {
+                showToast("Supabase SQL Schema copied to clipboard!", "success");
+            });
+        });
+
+        // Test Supabase Connection Button
         document.getElementById('btnTestCloudConnection').addEventListener('click', async () => {
             const statusEl = document.getElementById('cloudTestStatus');
-            statusEl.textContent = 'Testing connection...';
+            statusEl.textContent = 'Testing Supabase connection...';
             statusEl.style.color = 'var(--accent-1)';
 
-            const testUrl = CloudEngine.getEndpointUrl();
-            if (!testUrl) {
-                statusEl.textContent = 'Offline Mode (Local Only)';
-                statusEl.style.color = '#f87171';
+            const testUrl = document.getElementById('supabaseUrlInput').value.trim();
+            const testKey = document.getElementById('supabaseKeyInput').value.trim();
+
+            if (!testUrl || !testKey) {
+                statusEl.textContent = '⚠️ Please enter Supabase Project URL & Anon Key';
+                statusEl.style.color = '#fbbf24';
                 return;
             }
 
             try {
-                const res = await fetch(testUrl, { method: 'GET' });
-                if (res.ok) {
-                    statusEl.textContent = '🟢 Online Connection Successful (HTTP ' + res.status + ')';
-                    statusEl.style.color = '#34d399';
+                const client = window.supabase.createClient(testUrl, testKey);
+                const { data, error } = await client.from('cb_folders').select('id').limit(1);
+
+                if (error) {
+                    if (error.message.includes('relation "public.cb_folders" does not exist') || error.code === '42P01') {
+                        statusEl.textContent = '⚠️ Connected to Supabase, but tables missing. Run the SQL schema above in SQL editor!';
+                        statusEl.style.color = '#fbbf24';
+                    } else {
+                        statusEl.textContent = '❌ Supabase Error: ' + error.message;
+                        statusEl.style.color = '#f87171';
+                    }
                 } else {
-                    statusEl.textContent = '⚠️ Cloud returned HTTP ' + res.status;
-                    statusEl.style.color = '#fbbf24';
+                    statusEl.textContent = '⚡ Connected successfully! Supabase PostgreSQL tables are ready.';
+                    statusEl.style.color = '#3ecf8e';
                 }
             } catch (err) {
                 statusEl.textContent = '❌ Connection failed: ' + err.message;
@@ -3005,24 +3013,24 @@ if __name__ == "__main__":
         });
 
         document.getElementById('btnPushLocalToCloud').addEventListener('click', async () => {
-            const ok = await CloudEngine.pushAll(db);
+            const ok = await SupabaseEngine.pushAll(db);
             if (ok) {
-                showToast("All local folders & files pushed to Cloud DB!", "success");
+                showToast("All local folders & files pushed to Supabase!", "success");
             } else {
-                showToast("Failed to push data to cloud. Check cloud URL.", "error");
+                showToast("Failed to push data to Supabase. Check Supabase URL & Key.", "error");
             }
         });
 
         document.getElementById('btnPullCloudToLocal').addEventListener('click', async () => {
-            await syncFromCloud();
+            await syncFromSupabase(true);
         });
 
-        // Sync Online DB button on toolbar
+        // Sync Supabase button on toolbar
         document.getElementById('btnSyncCloud').addEventListener('click', async () => {
             const btn = document.getElementById('btnSyncCloud');
             btn.innerHTML = '<span>🔄</span> Syncing...';
-            await syncFromCloud();
-            btn.innerHTML = '<span>🔄</span> Sync Online DB';
+            await syncFromSupabase(true);
+            btn.innerHTML = '<span>⚡</span> Sync Supabase';
         });
 
         // ── Search & Filter ──
@@ -3082,8 +3090,8 @@ if __name__ == "__main__":
                             db = parsed;
                             persistLocally();
                             renderExplorer();
-                            await CloudEngine.pushAll(db);
-                            showToast("Database restored & synced to Cloud DB!", "success");
+                            await SupabaseEngine.pushAll(db);
+                            showToast("Database restored & synced to Supabase!", "success");
                         } else {
                             alert("Invalid database JSON structure.");
                         }
