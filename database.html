@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODE BRAINS — Private File & Folder Database</title>
+    <meta name="description" content="Personal and private file and folder database management for CODE BRAINS projects, source code, reports, PPTs, datasets, and IEEE papers.">
+    <link rel="icon" type="image/png" href="static/images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        .db-layout {
+            padding: 100px 0 60px;
+            min-height: 100vh;
+        }
+
+        /* ── AUTH LOCK SCREEN ── */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(31, 41, 55, 0.95), rgba(17, 24, 39, 0.98));
+            backdrop-filter: blur(20px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-xl);
+            padding: 44px 36px;
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            box-shadow: var(--shadow-glow), 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            animation: authPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes authPopIn {
+            from { opacity: 0; transform: scale(0.92) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .auth-logo {
+            height: 64px;
+            width: auto;
+            margin: 0 auto 16px;
+            filter: drop-shadow(0 0 20px rgba(250, 204, 21, 0.3));
+        }
+
+        .auth-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .auth-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .auth-input-group {
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .auth-input-group label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .auth-input-icon {
+            position: absolute;
+            left: 14px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 13px 44px 13px 42px;
+            border-radius: var(--radius-md);
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .auth-input:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.2);
+            background: rgba(17, 24, 39, 0.9);
+        }
+
+        .auth-pwd-toggle {
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0;
+            transition: var(--transition);
+        }
+
+        .auth-pwd-toggle:hover {
+            color: var(--accent-1);
+        }
+
+        .auth-error {
+            display: none;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 0.82rem;
+            margin-bottom: 18px;
+            text-align: left;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 13px;
+            border-radius: 50px;
+            background: var(--gradient-1);
+            color: #111827;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 8px;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(250, 204, 21, 0.35);
+        }
+
+        .auth-back-link {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+
+        .auth-back-link:hover {
+            color: var(--accent-1);
+        }
+
+        /* ── DATABASE DASHBOARD ── */
+        .db-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .db-title-area h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .db-user-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            background: rgba(250, 204, 21, 0.1);
+            color: var(--accent-1);
+            border: 1px solid rgba(250, 204, 21, 0.25);
+        }
+
+        .db-logout-btn {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #f87171;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-left: 10px;
+        }
+
+        .db-logout-btn:hover {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .db-stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .db-stat-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 18px 24px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: var(--transition);
+        }
+
+        .db-stat-box:hover {
+            border-color: var(--accent-1);
+            transform: translateY(-2px);
+        }
+
+        .db-stat-icon {
+            font-size: 2rem;
+        }
+
+        .db-stat-info span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .db-stat-info strong {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--accent-1);
+        }
+
+        .db-container-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-card);
+        }
+
+        .db-toolbar {
+            padding: 20px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .db-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .db-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: var(--transition);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .db-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-1);
+        }
+
+        .db-btn-primary {
+            background: var(--gradient-1);
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .db-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(250, 204, 21, 0.3);
+        }
+
+        .db-search-box {
+            position: relative;
+            min-width: 260px;
+        }
+
+        .db-search-input {
+            width: 100%;
+            padding: 9px 18px 9px 38px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .db-search-input:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.15);
+        }
+
+        .db-search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+
+        .db-filter-chips {
+            display: flex;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(0, 0, 0, 0.15);
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+        }
+
+        .db-chip {
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: var(--transition);
+        }
+
+        .db-chip.active,
+        .db-chip:hover {
+            background: rgba(250, 204, 21, 0.15);
+            border-color: var(--accent-1);
+            color: var(--accent-1);
+        }
+
+        .db-breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .db-breadcrumb-link {
+            color: var(--accent-1);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .db-breadcrumb-link:hover {
+            text-decoration: underline;
+        }
+
+        .db-content-area {
+            padding: 24px;
+            min-height: 400px;
+        }
+
+        .db-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .db-item-card {
+            position: relative;
+            padding: 16px;
+            border-radius: var(--radius-md);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .db-item-card:hover {
+            border-color: var(--accent-1);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-card);
+            background: var(--bg-card-hover);
+        }
+
+        .db-item-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .db-item-icon {
+            font-size: 2.2rem;
+        }
+
+        .db-item-menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .db-item-menu-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .db-item-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            word-break: break-word;
+            line-height: 1.4;
+            margin-bottom: 6px;
+        }
+
+        .db-item-meta {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .db-empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .db-empty-icon {
+            font-size: 3.5rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Drag and Drop Zone */
+        .db-dropzone {
+            border: 2px dashed rgba(250, 204, 21, 0.3);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 24px;
+            background: rgba(250, 204, 21, 0.02);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .db-dropzone.dragover {
+            border-color: var(--accent-1);
+            background: rgba(250, 204, 21, 0.08);
+        }
+
+        /* Modal Styles */
+        .db-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .db-modal-overlay.active {
+            display: flex;
+        }
+
+        .db-modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 650px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            animation: modalFadeIn 0.25s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .db-modal-header {
+            padding: 18px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .db-modal-header h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-1);
+        }
+
+        .db-modal-close {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .db-modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .db-modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .db-form-group {
+            margin-bottom: 18px;
+        }
+
+        .db-form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .db-form-input,
+        .db-form-select,
+        .db-form-textarea {
+            width: 100%;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: var(--font-sans);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .db-form-textarea {
+            font-family: var(--font-mono);
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .db-form-input:focus,
+        .db-form-select:focus,
+        .db-form-textarea:focus {
+            border-color: var(--accent-1);
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.15);
+        }
+
+        .db-modal-footer {
+            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .code-preview-box {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: #E6EDF3;
+            max-height: 380px;
+            overflow: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ═══════════ AUTHENTICATION LOCK OVERLAY ═══════════ -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-card">
+            <img src="static/images/logo.png" alt="Code Brains" class="auth-logo">
+            <h2 class="auth-title">🔐 Private Database</h2>
+            <p class="auth-subtitle">Authorized Access Only. Please enter your administrator credentials to proceed.</p>
+
+            <div class="auth-error" id="authError">
+                ⚠️ Incorrect username or password. Access Denied.
+            </div>
+
+            <form id="authForm">
+                <div class="auth-input-group">
+                    <label>Username</label>
+                    <div class="auth-input-wrapper">
+                        <span class="auth-input-icon">👤</span>
+                        <input type="text" id="authUsername" class="auth-input" placeholder="Enter username" autocomplete="username" required>
+                    </div>
+                </div>
+
+                <div class="auth-input-group">
+                    <label>Password</label>
+                    <div class="auth-input-wrapper">
+                        <span class="auth-input-icon">🔒</span>
+                        <input type="password" id="authPassword" class="auth-input" placeholder="Enter password" autocomplete="current-password" required>
+                        <button type="button" class="auth-pwd-toggle" id="authPwdToggle" title="Toggle password visibility">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    <span>Unlock Database</span> →
+                </button>
+            </form>
+
+            <a href="index.html" class="auth-back-link">← Return to Homepage</a>
+        </div>
+    </div>
+
+    <!-- ═══════════ NAVBAR ═══════════ -->
+    <nav class="navbar scrolled" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <img src="static/images/logo.png" alt="Code Brains" class="logo-img">
+                <span class="logo-text">CODE <span class="accent">BRAINS</span></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#domains">Domains</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#pricing">Pricing</a></li>
+                <li><a href="database.html" style="color: var(--accent-1); font-weight: 700;">🗄️ Database</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <div>
+                <button class="db-logout-btn" id="navLogoutBtn">🚪 Logout</button>
+            </div>
+            <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ═══════════ DATABASE MAIN ═══════════ -->
+    <section class="db-layout" id="dbMainSection" style="display: none;">
+        <div class="container">
+            
+            <div class="db-header">
+                <div class="db-title-area">
+                    <h1>🗄️ Project & Files Database</h1>
+                    <p style="color: var(--text-secondary); margin-top: 4px; font-size: 0.95rem;">
+                        Private storage for your Python source codes, presentations, reports, IEEE papers, and datasets.
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span class="db-user-badge">👤 mastan (Admin)</span>
+                    <button class="db-logout-btn" id="dbHeaderLogoutBtn">Logout</button>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="db-stats-bar">
+                <div class="db-stat-box">
+                    <span class="db-stat-icon">📁</span>
+                    <div class="db-stat-info">
+                        <span>Total Folders</span>
+                        <strong id="statFolders">8</strong>
+                    </div>
+                </div>
+                <div class="db-stat-box">
+                    <span class="db-stat-icon">📄</span>
+                    <div class="db-stat-info">
+                        <span>Total Files</span>
+                        <strong id="statFiles">15</strong>
+                    </div>
+                </div>
+                <div class="db-stat-box">
+                    <span class="db-stat-icon">💾</span>
+                    <div class="db-stat-info">
+                        <span>Storage Used</span>
+                        <strong id="statStorage">14.8 MB</strong>
+                    </div>
+                </div>
+                <div class="db-stat-box">
+                    <span class="db-stat-icon">⚡</span>
+                    <div class="db-stat-info">
+                        <span>Database Status</span>
+                        <strong style="color: #43E97B;">Active & Protected</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Explorer Card -->
+            <div class="db-container-card">
+                
+                <!-- Toolbar -->
+                <div class="db-toolbar">
+                    <div class="db-actions">
+                        <button class="db-btn db-btn-primary" id="btnNewFolder">
+                            <span>📁</span> New Folder
+                        </button>
+                        <button class="db-btn" id="btnUploadFile">
+                            <span>⬆️</span> Upload File
+                        </button>
+                        <button class="db-btn" id="btnNewCode">
+                            <span>📝</span> Create Code File
+                        </button>
+                        <button class="db-btn" id="btnExportDb" title="Backup Database to JSON">
+                            <span>📥</span> Backup DB
+                        </button>
+                        <button class="db-btn" id="btnImportDb" title="Restore Database from JSON">
+                            <span>📤</span> Restore DB
+                        </button>
+                    </div>
+
+                    <div class="db-search-box">
+                        <span class="db-search-icon">🔍</span>
+                        <input type="text" id="dbSearchInput" class="db-search-input" placeholder="Search files, code, folders...">
+                    </div>
+                </div>
+
+                <!-- Category Chips -->
+                <div class="db-filter-chips">
+                    <button class="db-chip active" data-filter="all">All Items</button>
+                    <button class="db-chip" data-filter="folder">📁 Folders</button>
+                    <button class="db-chip" data-filter="code">🐍 Python / Code</button>
+                    <button class="db-chip" data-filter="presentation">📊 PPT Presentations</button>
+                    <button class="db-chip" data-filter="report">📄 Reports & Docs</button>
+                    <button class="db-chip" data-filter="dataset">🗃️ Datasets</button>
+                    <button class="db-chip" data-filter="paper">📰 IEEE Papers</button>
+                </div>
+
+                <!-- Breadcrumbs -->
+                <div class="db-breadcrumbs" id="dbBreadcrumbs">
+                    <span class="db-breadcrumb-link" data-path="root">Root</span>
+                </div>
+
+                <!-- Content Area -->
+                <div class="db-content-area">
+                    
+                    <!-- Drag and Drop Box -->
+                    <div class="db-dropzone" id="dbDropzone">
+                        <span style="font-size: 2rem; display: block; margin-bottom: 8px;">📤</span>
+                        <p style="font-weight: 600; color: var(--text-primary);">Drag and drop files here to store in this folder</p>
+                        <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 4px;">Supports Python (.py, .ipynb), PPT (.pptx), PDF, DOCX, ZIP, CSV, Datasets</p>
+                        <input type="file" id="hiddenFileInput" multiple style="display: none;">
+                    </div>
+
+                    <!-- Items Grid -->
+                    <div class="db-grid" id="dbItemsGrid">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <div class="db-empty-state" id="dbEmptyState" style="display: none;">
+                        <div class="db-empty-icon">📭</div>
+                        <p style="font-weight: 600; font-size: 1.1rem; color: var(--text-primary);">This folder is empty</p>
+                        <p style="font-size: 0.85rem; margin-top: 6px;">Click "Upload File" or "New Folder" above to add items.</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ═══════════ MODALS ═══════════ -->
+
+    <!-- New Folder Modal -->
+    <div class="db-modal-overlay" id="folderModal">
+        <div class="db-modal">
+            <div class="db-modal-header">
+                <h3>📁 Create New Folder</h3>
+                <button class="db-modal-close" data-close="folderModal">&times;</button>
+            </div>
+            <div class="db-modal-body">
+                <div class="db-form-group">
+                    <label>Folder Name</label>
+                    <input type="text" id="folderNameInput" class="db-form-input" placeholder="e.g. Computer_Vision_Models">
+                </div>
+                <div class="db-form-group">
+                    <label>Category Tag</label>
+                    <select id="folderCategorySelect" class="db-form-select">
+                        <option value="General">General</option>
+                        <option value="Machine Learning">Machine Learning</option>
+                        <option value="Computer Vision">Computer Vision</option>
+                        <option value="Deep Learning">Deep Learning</option>
+                        <option value="NLP & Speech">NLP & Speech</option>
+                        <option value="Reports & PPT">Reports & PPT</option>
+                        <option value="IEEE Research">IEEE Research</option>
+                    </select>
+                </div>
+            </div>
+            <div class="db-modal-footer">
+                <button class="db-btn" data-close="folderModal">Cancel</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmFolder">Create Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Code File Modal -->
+    <div class="db-modal-overlay" id="codeModal">
+        <div class="db-modal" style="max-width: 800px;">
+            <div class="db-modal-header">
+                <h3>📝 Create New Code / Text File</h3>
+                <button class="db-modal-close" data-close="codeModal">&times;</button>
+            </div>
+            <div class="db-modal-body">
+                <div class="db-form-group">
+                    <label>File Name (with extension)</label>
+                    <input type="text" id="codeFileNameInput" class="db-form-input" placeholder="e.g. pothole_detection_yolov8.py">
+                </div>
+                <div class="db-form-group">
+                    <label>File Content</label>
+                    <textarea id="codeFileContentInput" class="db-form-textarea" placeholder="# Enter Python or source code here..."></textarea>
+                </div>
+            </div>
+            <div class="db-modal-footer">
+                <button class="db-btn" data-close="codeModal">Cancel</button>
+                <button class="db-btn db-btn-primary" id="btnConfirmCode">Save File</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View / Preview File Modal -->
+    <div class="db-modal-overlay" id="previewModal">
+        <div class="db-modal" style="max-width: 850px;">
+            <div class="db-modal-header">
+                <h3 id="previewTitle">📄 File Preview</h3>
+                <button class="db-modal-close" data-close="previewModal">&times;</button>
+            </div>
+            <div class="db-modal-body">
+                <div class="code-preview-box" id="previewContent">
+                    Loading content...
+                </div>
+            </div>
+            <div class="db-modal-footer">
+                <button class="db-btn db-btn-primary" id="btnDownloadPreview">📥 Download File</button>
+                <button class="db-btn" data-close="previewModal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════ JAVASCRIPT AUTHENTICATION & DATABASE ENGINE ═══════════ -->
+    <script>
+        // ── Security Credentials ──
+        const AUTH_CONFIG = {
+            validUser: 'mastan',
+            validPass: 'Zero@124',
+            sessionKey: 'cb_authenticated_user'
+        };
+
+        const authOverlay = document.getElementById('authOverlay');
+        const dbMainSection = document.getElementById('dbMainSection');
+        const authForm = document.getElementById('authForm');
+        const authError = document.getElementById('authError');
+        const authUsername = document.getElementById('authUsername');
+        const authPassword = document.getElementById('authPassword');
+        const authPwdToggle = document.getElementById('authPwdToggle');
+
+        // Toggle password visibility
+        authPwdToggle.addEventListener('click', () => {
+            const isPassword = authPassword.type === 'password';
+            authPassword.type = isPassword ? 'text' : 'password';
+            authPwdToggle.textContent = isPassword ? '🙈' : '👁️';
+        });
+
+        // Check authentication state on page load
+        function checkAuth() {
+            const savedSession = sessionStorage.getItem(AUTH_CONFIG.sessionKey) || localStorage.getItem(AUTH_CONFIG.sessionKey);
+            if (savedSession === AUTH_CONFIG.validUser) {
+                unlockDashboard();
+            } else {
+                lockDashboard();
+            }
+        }
+
+        function unlockDashboard() {
+            authOverlay.style.display = 'none';
+            dbMainSection.style.display = 'block';
+            document.getElementById('navLogoutBtn').style.display = 'inline-block';
+            renderExplorer();
+        }
+
+        function lockDashboard() {
+            authOverlay.style.display = 'flex';
+            dbMainSection.style.display = 'none';
+            document.getElementById('navLogoutBtn').style.display = 'none';
+            authPassword.value = '';
+        }
+
+        // Handle login form submission
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const user = authUsername.value.trim();
+            const pass = authPassword.value;
+
+            if (user === AUTH_CONFIG.validUser && pass === AUTH_CONFIG.validPass) {
+                authError.style.display = 'none';
+                sessionStorage.setItem(AUTH_CONFIG.sessionKey, user);
+                localStorage.setItem(AUTH_CONFIG.sessionKey, user);
+                unlockDashboard();
+            } else {
+                authError.style.display = 'block';
+                authError.classList.remove('shake');
+                void authError.offsetWidth; // Trigger reflow for animation
+                authError.classList.add('shake');
+            }
+        });
+
+        // Logout action
+        function performLogout() {
+            sessionStorage.removeItem(AUTH_CONFIG.sessionKey);
+            localStorage.removeItem(AUTH_CONFIG.sessionKey);
+            lockDashboard();
+        }
+
+        document.getElementById('navLogoutBtn').addEventListener('click', performLogout);
+        document.getElementById('dbHeaderLogoutBtn').addEventListener('click', performLogout);
+
+        // ── In-Memory & LocalStorage Database Initial State ──
+        const DB_STORAGE_KEY = 'codebrains_user_database_v1';
+
+        const defaultDatabase = {
+            currentFolderId: 'root',
+            folders: [
+                { id: 'f_cv', parentId: 'root', name: 'Computer Vision Projects', category: 'Computer Vision', date: '2026-08-25' },
+                { id: 'f_ml', parentId: 'root', name: 'Machine Learning Models', category: 'Machine Learning', date: '2026-08-25' },
+                { id: 'f_ai', parentId: 'root', name: 'Deep Learning & AI', category: 'Deep Learning', date: '2026-08-25' },
+                { id: 'f_nlp', parentId: 'root', name: 'NLP & Speech Processing', category: 'NLP & Speech', date: '2026-08-25' },
+                { id: 'f_web', parentId: 'root', name: 'Web & Full Stack Apps', category: 'General', date: '2026-08-25' },
+                { id: 'f_ds', parentId: 'root', name: 'Data Science & Datasets', category: 'General', date: '2026-08-25' },
+                { id: 'f_docs', parentId: 'root', name: 'Reports, PPTs & IEEE Papers', category: 'Reports & PPT', date: '2026-08-25' },
+                { id: 'f_custom', parentId: 'root', name: 'My Custom Project Uploads', category: 'General', date: '2026-08-25' }
+            ],
+            files: [
+                {
+                    id: 'file_1',
+                    folderId: 'f_cv',
+                    name: 'pothole_detection_yolov8.py',
+                    type: 'code',
+                    size: '4.8 KB',
+                    date: '2026-08-26',
+                    content: `import cv2\nfrom ultralytics import YOLO\n\n# Load YOLOv8 object detection model for Pothole and Road Damage\nmodel = YOLO("yolov8n_pothole.pt")\n\ndef analyze_road_frame(frame):\n    results = model(frame, conf=0.5)\n    for r in results:\n        boxes = r.boxes\n        for box in boxes:\n            cls = int(box.cls[0])\n            conf = float(box.conf[0])\n            x1, y1, x2, y2 = map(int, box.xyxy[0])\n            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 201, 255), 2)\n            cv2.putText(frame, f"Pothole: {conf:.2f}", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 201, 255), 2)\n    return frame\n\nprint("🚀 Pothole Detection Model Loaded Successfully!")`
+                },
+                {
+                    id: 'file_2',
+                    folderId: 'f_cv',
+                    name: 'traffic_violation_tracking.py',
+                    type: 'code',
+                    size: '6.2 KB',
+                    date: '2026-08-26',
+                    content: `import numpy as np\nimport cv2\n\n# Traffic Violation & Red Light Jump Detection Module\nclass TrafficViolationTracker:\n    def __init__(self, stop_line_y=350):\n        self.stop_line_y = stop_line_y\n        self.violations = []\n\n    def check_violation(self, vehicle_id, current_y, light_status="RED"):\n        if light_status == "RED" and current_y > self.stop_line_y:\n            self.violations.append(vehicle_id)\n            print(f"⚠️ VIOLATION DETECTED: Vehicle {vehicle_id} jumped RED signal!")\n            return True\n        return False\n\ntracker = TrafficViolationTracker()`
+                },
+                {
+                    id: 'file_3',
+                    folderId: 'f_cv',
+                    name: 'anpr_license_plate_recognition.py',
+                    type: 'code',
+                    size: '5.1 KB',
+                    date: '2026-08-26',
+                    content: `import easyocr\nimport cv2\n\nreader = easyocr.Reader(['en'])\n\ndef extract_number_plate(plate_image_crop):\n    result = reader.readtext(plate_image_crop)\n    for (bbox, text, prob) in result:\n        if prob > 0.6:\n            print(f"Recognized Vehicle Plate: {text} (Confidence: {prob:.2f})")\n            return text\n    return "UNKNOWN"`
+                },
+                {
+                    id: 'file_4',
+                    folderId: 'f_docs',
+                    name: 'Code_Brains_Computer_Vision_Final_Report.pdf',
+                    type: 'report',
+                    size: '2.4 MB',
+                    date: '2026-08-26',
+                    content: `[PROJECT REPORT: Computer Vision & AI Autonomous Systems]\n\nAbstract:\nThis comprehensive study outlines modern Deep Learning and Computer Vision methodologies applied to Smart Cities, Traffic Violation Detection, and Autonomous Driving Systems.\n\nMethodology:\n1. Data preprocessing and Augmentation\n2. YOLOv8 & ResNet Architecture Training\n3. Real-time Inference Pipeline\n4. Results and Accuracy Evaluation: 96.4% Precision on test split.`
+                },
+                {
+                    id: 'file_5',
+                    folderId: 'f_docs',
+                    name: 'Autonomous_Vehicle_Simulation_Presentation.pptx',
+                    type: 'presentation',
+                    size: '4.1 MB',
+                    date: '2026-08-26',
+                    content: `Slide 1: Title - End-to-End Autonomous Vehicle Simulation with Computer Vision\nSlide 2: Problem Statement & Objectives\nSlide 3: Lane Detection & Collision Warning Architecture\nSlide 4: Real-time Object Detection with YOLOv8\nSlide 5: Results & Viva Q&A Guide`
+                },
+                {
+                    id: 'file_6',
+                    folderId: 'f_docs',
+                    name: 'IEEE_Research_Paper_Road_Safety_2026.pdf',
+                    type: 'paper',
+                    size: '1.8 MB',
+                    date: '2026-08-26',
+                    content: `IEEE Transactions on Intelligent Transportation Systems (2026)\nPaper: AI-Powered Computer Vision Framework for Real-Time Urban Safety & Traffic Hazard Detection.`
+                },
+                {
+                    id: 'file_7',
+                    folderId: 'f_ml',
+                    name: 'student_dropout_prediction_rf.py',
+                    type: 'code',
+                    size: '3.4 KB',
+                    date: '2026-08-25',
+                    content: `import pandas as pd\nfrom sklearn.ensemble import RandomForestClassifier\nfrom sklearn.model_selection import train_test_split\n\n# Student Performance & Dropout Prediction Model\ndf = pd.read_csv("student_data.csv")\nX = df.drop(columns=['dropout'])\ny = df['dropout']\n\nX_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)\nclf = RandomForestClassifier(n_estimators=100)\nclf.fit(X_train, y_train)\nprint(f"Model Accuracy: {clf.score(X_test, y_test)*100:.2f}%")`
+                },
+                {
+                    id: 'file_8',
+                    folderId: 'f_ds',
+                    name: 'telecom_customer_churn_dataset.csv',
+                    type: 'dataset',
+                    size: '1.2 MB',
+                    date: '2026-08-25',
+                    content: `customerID,gender,SeniorCitizen,Partner,Dependents,tenure,PhoneService,MonthlyCharges,TotalCharges,Churn\n7590-VHVEG,Female,0,Yes,No,1,No,29.85,29.85,No\n5575-GNVDE,Male,0,No,No,34,Yes,56.95,1889.5,No\n3668-QPYBK,Male,0,No,No,2,Yes,53.85,108.15,Yes`
+                }
+            ]
+        };
+
+        // Load or initialize DB
+        function getDatabase() {
+            const saved = localStorage.getItem(DB_STORAGE_KEY);
+            if (saved) {
+                try { return JSON.parse(saved); } catch (e) { return defaultDatabase; }
+            }
+            return defaultDatabase;
+        }
+
+        function saveDatabase(databaseObj) {
+            localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(databaseObj));
+            updateStats();
+        }
+
+        let db = getDatabase();
+        let currentFolderId = 'root';
+        let activeFilter = 'all';
+        let searchQuery = '';
+
+        // ── Helper to format icons ──
+        function getItemIcon(item, isFolder) {
+            if (isFolder) return '📁';
+            const name = item.name.toLowerCase();
+            if (name.endsWith('.py')) return '🐍';
+            if (name.endsWith('.ipynb')) return '📓';
+            if (name.endsWith('.pdf')) return '📕';
+            if (name.endsWith('.pptx') || name.endsWith('.ppt')) return '📊';
+            if (name.endsWith('.csv') || name.endsWith('.xlsx')) return '🗃️';
+            if (name.endsWith('.json')) return '⚙️';
+            if (name.endsWith('.zip') || name.endsWith('.rar')) return '📦';
+            if (name.endsWith('.png') || name.endsWith('.jpg')) return '🖼️';
+            return '📄';
+        }
+
+        // ── Render Explorer ──
+        function renderExplorer() {
+            const grid = document.getElementById('dbItemsGrid');
+            const emptyState = document.getElementById('dbEmptyState');
+            grid.innerHTML = '';
+
+            // Filter folders and files
+            let currentFolders = db.folders.filter(f => f.parentId === currentFolderId);
+            let currentFiles = db.files.filter(f => f.folderId === currentFolderId);
+
+            // Apply search
+            if (searchQuery) {
+                currentFolders = db.folders.filter(f => f.name.toLowerCase().includes(searchQuery));
+                currentFiles = db.files.filter(f => f.name.toLowerCase().includes(searchQuery));
+            }
+
+            // Apply category filter
+            if (activeFilter === 'folder') currentFiles = [];
+            else if (activeFilter === 'code') {
+                currentFolders = [];
+                currentFiles = currentFiles.filter(f => f.type === 'code' || f.name.endsWith('.py') || f.name.endsWith('.ipynb'));
+            } else if (activeFilter === 'presentation') {
+                currentFolders = [];
+                currentFiles = currentFiles.filter(f => f.type === 'presentation' || f.name.endsWith('.pptx') || f.name.endsWith('.ppt'));
+            } else if (activeFilter === 'report') {
+                currentFolders = [];
+                currentFiles = currentFiles.filter(f => f.type === 'report' || f.name.endsWith('.pdf') || f.name.endsWith('.docx'));
+            } else if (activeFilter === 'dataset') {
+                currentFolders = [];
+                currentFiles = currentFiles.filter(f => f.type === 'dataset' || f.name.endsWith('.csv') || f.name.endsWith('.json'));
+            } else if (activeFilter === 'paper') {
+                currentFolders = [];
+                currentFiles = currentFiles.filter(f => f.type === 'paper');
+            }
+
+            const totalItems = currentFolders.length + currentFiles.length;
+
+            if (totalItems === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+
+                // Render Folders
+                currentFolders.forEach(folder => {
+                    const card = document.createElement('div');
+                    card.className = 'db-item-card';
+                    card.innerHTML = `
+                        <div class="db-item-top">
+                            <span class="db-item-icon">📁</span>
+                            <button class="db-item-menu-btn" onclick="event.stopPropagation(); deleteFolder('${folder.id}')" title="Delete Folder">🗑️</button>
+                        </div>
+                        <div class="db-item-name">${folder.name}</div>
+                        <div class="db-item-meta">
+                            <span>${folder.category || 'Folder'}</span>
+                            <span>${folder.date}</span>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => {
+                        currentFolderId = folder.id;
+                        renderBreadcrumbs();
+                        renderExplorer();
+                    });
+                    grid.appendChild(card);
+                });
+
+                // Render Files
+                currentFiles.forEach(file => {
+                    const card = document.createElement('div');
+                    card.className = 'db-item-card';
+                    const icon = getItemIcon(file, false);
+                    card.innerHTML = `
+                        <div class="db-item-top">
+                            <span class="db-item-icon">${icon}</span>
+                            <button class="db-item-menu-btn" onclick="event.stopPropagation(); deleteFile('${file.id}')" title="Delete File">🗑️</button>
+                        </div>
+                        <div class="db-item-name">${file.name}</div>
+                        <div class="db-item-meta">
+                            <span>${file.size || '1.0 KB'}</span>
+                            <span>${file.date}</span>
+                        </div>
+                    `;
+                    card.addEventListener('click', () => previewFile(file));
+                    grid.appendChild(card);
+                });
+            }
+
+            renderBreadcrumbs();
+            updateStats();
+        }
+
+        // ── Render Breadcrumbs ──
+        function renderBreadcrumbs() {
+            const bc = document.getElementById('dbBreadcrumbs');
+            if (currentFolderId === 'root') {
+                bc.innerHTML = `<span class="db-breadcrumb-link" onclick="navigateToFolder('root')">Root (All Folders)</span>`;
+                return;
+            }
+
+            const current = db.folders.find(f => f.id === currentFolderId);
+            bc.innerHTML = `
+                <span class="db-breadcrumb-link" onclick="navigateToFolder('root')">Root</span>
+                <span>/</span>
+                <span style="color: var(--text-primary); font-weight: 700;">${current ? current.name : 'Folder'}</span>
+            `;
+        }
+
+        window.navigateToFolder = function(id) {
+            currentFolderId = id;
+            searchQuery = '';
+            document.getElementById('dbSearchInput').value = '';
+            renderExplorer();
+        };
+
+        // ── Update Statistics ──
+        function updateStats() {
+            document.getElementById('statFolders').textContent = db.folders.length;
+            document.getElementById('statFiles').textContent = db.files.length;
+            const approxMB = (db.files.length * 1.1 + db.folders.length * 0.2).toFixed(1);
+            document.getElementById('statStorage').textContent = approxMB + ' MB';
+        }
+
+        // ── Delete File / Folder ──
+        window.deleteFolder = function(id) {
+            if (confirm("Are you sure you want to delete this folder and its files?")) {
+                db.folders = db.folders.filter(f => f.id !== id);
+                db.files = db.files.filter(f => f.folderId !== id);
+                saveDatabase(db);
+                renderExplorer();
+            }
+        };
+
+        window.deleteFile = function(id) {
+            if (confirm("Delete this file permanently?")) {
+                db.files = db.files.filter(f => f.id !== id);
+                saveDatabase(db);
+                renderExplorer();
+            }
+        };
+
+        // ── Preview & Download ──
+        let activePreviewFile = null;
+
+        function previewFile(file) {
+            activePreviewFile = file;
+            document.getElementById('previewTitle').textContent = `📄 ${file.name}`;
+            document.getElementById('previewContent').textContent = file.content || `[Binary / File Package: ${file.name}]\nSize: ${file.size}\nDate Stored: ${file.date}\nStatus: Ready to export / download.`;
+            document.getElementById('previewModal').classList.add('active');
+        }
+
+        document.getElementById('btnDownloadPreview').addEventListener('click', () => {
+            if (!activePreviewFile) return;
+            const blob = new Blob([activePreviewFile.content || "Code Brains Asset File"], { type: 'text/plain;charset=utf-8' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = activePreviewFile.name;
+            a.click();
+        });
+
+        // ── Modals & Actions ──
+        document.querySelectorAll('[data-close]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.dataset.close;
+                document.getElementById(target).classList.remove('active');
+            });
+        });
+
+        // Open New Folder Modal
+        document.getElementById('btnNewFolder').addEventListener('click', () => {
+            document.getElementById('folderNameInput').value = '';
+            document.getElementById('folderModal').classList.add('active');
+        });
+
+        document.getElementById('btnConfirmFolder').addEventListener('click', () => {
+            const name = document.getElementById('folderNameInput').value.trim();
+            if (!name) return alert("Please enter a folder name");
+            const cat = document.getElementById('folderCategorySelect').value;
+            const newFolder = {
+                id: 'f_' + Date.now(),
+                parentId: currentFolderId,
+                name: name,
+                category: cat,
+                date: new Date().toISOString().split('T')[0]
+            };
+            db.folders.push(newFolder);
+            saveDatabase(db);
+            document.getElementById('folderModal').classList.remove('active');
+            renderExplorer();
+        });
+
+        // Open Create Code Modal
+        document.getElementById('btnNewCode').addEventListener('click', () => {
+            document.getElementById('codeFileNameInput').value = '';
+            document.getElementById('codeFileContentInput').value = '';
+            document.getElementById('codeModal').classList.add('active');
+        });
+
+        document.getElementById('btnConfirmCode').addEventListener('click', () => {
+            const name = document.getElementById('codeFileNameInput').value.trim();
+            const content = document.getElementById('codeFileContentInput').value;
+            if (!name) return alert("Please enter a file name (e.g. model.py)");
+            const newFile = {
+                id: 'file_' + Date.now(),
+                folderId: currentFolderId,
+                name: name,
+                type: 'code',
+                size: (content.length / 1024).toFixed(1) + ' KB',
+                date: new Date().toISOString().split('T')[0],
+                content: content
+            };
+            db.files.push(newFile);
+            saveDatabase(db);
+            document.getElementById('codeModal').classList.remove('active');
+            renderExplorer();
+        });
+
+        // Upload File Action
+        const hiddenFileInput = document.getElementById('hiddenFileInput');
+        document.getElementById('btnUploadFile').addEventListener('click', () => hiddenFileInput.click());
+        document.getElementById('dbDropzone').addEventListener('click', () => hiddenFileInput.click());
+
+        hiddenFileInput.addEventListener('change', function() {
+            handleFileUpload(this.files);
+        });
+
+        // Drag & Drop
+        const dropzone = document.getElementById('dbDropzone');
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            handleFileUpload(e.dataTransfer.files);
+        });
+
+        function handleFileUpload(fileList) {
+            Array.from(fileList).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const newFile = {
+                        id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                        folderId: currentFolderId,
+                        name: file.name,
+                        type: file.name.endsWith('.py') ? 'code' : file.name.endsWith('.pptx') ? 'presentation' : 'report',
+                        size: (file.size / 1024).toFixed(1) + ' KB',
+                        date: new Date().toISOString().split('T')[0],
+                        content: e.target.result
+                    };
+                    db.files.push(newFile);
+                    saveDatabase(db);
+                    renderExplorer();
+                };
+                if (file.name.match(/\.(py|ipynb|txt|csv|json|md|html|css|js)$/i)) {
+                    reader.readAsText(file);
+                } else {
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        // Search Filter
+        document.getElementById('dbSearchInput').addEventListener('input', function() {
+            searchQuery = this.value.toLowerCase().trim();
+            renderExplorer();
+        });
+
+        // Category Filter Chips
+        document.querySelectorAll('.db-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                document.querySelectorAll('.db-chip').forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                activeFilter = chip.dataset.filter;
+                renderExplorer();
+            });
+        });
+
+        // Backup / Export Database to JSON
+        document.getElementById('btnExportDb').addEventListener('click', () => {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", "codebrains_database_backup_" + new Date().toISOString().split('T')[0] + ".json");
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        });
+
+        // Restore / Import Database from JSON
+        document.getElementById('btnImportDb').addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const parsed = JSON.parse(event.target.result);
+                        if (parsed.folders && parsed.files) {
+                            db = parsed;
+                            saveDatabase(db);
+                            renderExplorer();
+                            alert("Database restored successfully!");
+                        }
+                    } catch (err) {
+                        alert("Invalid database JSON file.");
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        });
+
+        // Initialize Authentication on load
+        checkAuth();
+    </script>
+</body>
+
+</html>
