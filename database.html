@@ -1753,8 +1753,8 @@ alter publication supabase_realtime add table cb_files;</div>
         };
 
         let cloudConfig = {
-            provider: globalDefault.activeProvider || 'firebase',
-            firebaseUrl: (globalDefault.firebase && globalDefault.firebase.databaseUrl) || 'https://codebrains-cloud-db-default-rtdb.firebaseio.com/',
+            provider: (globalDefault.activeProvider && globalDefault.activeProvider !== 'supabase') || (globalDefault.supabase && globalDefault.supabase.anonKey) ? globalDefault.activeProvider : 'local',
+            firebaseUrl: (globalDefault.firebase && globalDefault.firebase.databaseUrl) || '',
             firebaseNamespace: (globalDefault.firebase && globalDefault.firebase.dbNamespace) || 'codebrains_master_store_v2',
             supabaseUrl: (globalDefault.supabase && globalDefault.supabase.url) || '',
             supabaseKey: (globalDefault.supabase && globalDefault.supabase.anonKey) || ''
@@ -1765,8 +1765,18 @@ alter publication supabase_realtime add table cb_files;</div>
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
+                    // Filter out legacy placeholder URL
+                    if (parsed.supabaseUrl && parsed.supabaseUrl.includes('xyzcompany')) {
+                        parsed.supabaseUrl = '';
+                        parsed.supabaseKey = '';
+                    }
                     cloudConfig = { ...cloudConfig, ...parsed };
                 } catch (e) {}
+            }
+
+            // If Supabase is selected but no key is provided, default gracefully to local mode
+            if (cloudConfig.provider === 'supabase' && (!cloudConfig.supabaseKey || !cloudConfig.supabaseUrl)) {
+                cloudConfig.provider = 'local';
             }
         }
 
@@ -1780,7 +1790,7 @@ alter publication supabase_realtime add table cb_files;</div>
 
         function getSupabaseClient() {
             if (supabaseClient) return supabaseClient;
-            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey && window.supabase) {
+            if (cloudConfig.supabaseUrl && cloudConfig.supabaseKey && window.supabase && !cloudConfig.supabaseUrl.includes('xyzcompany')) {
                 try {
                     supabaseClient = window.supabase.createClient(cloudConfig.supabaseUrl, cloudConfig.supabaseKey);
                     setupSupabaseRealtime(supabaseClient);
@@ -1840,30 +1850,35 @@ alter publication supabase_realtime add table cb_files;</div>
                             : 'Universal Cloud DB';
                     }
                 } else if (state === 'offline') {
-                    if (badge) badge.className = 'db-cloud-badge offline';
-                    if (dot) dot.textContent = '🔴';
-                    if (text) text.textContent = message || 'Local Storage Only (Offline)';
-                    if (statSync) statSync.textContent = 'Offline';
-                    if (statStorage) statStorage.textContent = 'Local Browser DB';
+                    if (badge) badge.className = 'db-cloud-badge';
+                    if (dot) dot.textContent = '🗄️';
+                    if (text) text.textContent = message || 'Local Storage (Setup Cloud DB)';
+                    if (statSync) statSync.textContent = 'Local Device';
+                    if (statStorage) statStorage.textContent = 'Local Storage (IndexedDB)';
                 }
             },
 
             getFirebaseEndpoint() {
-                let base = (cloudConfig.firebaseUrl || 'https://codebrains-cloud-db-default-rtdb.firebaseio.com/').replace(/\/$/, '');
+                if (!cloudConfig.firebaseUrl) return null;
+                let base = cloudConfig.firebaseUrl.replace(/\/$/, '');
                 let room = (cloudConfig.firebaseNamespace || 'codebrains_master_store_v2').trim();
                 return `${base}/${room}.json`;
             },
 
             async fetchAll() {
                 if (cloudConfig.provider === 'local') {
-                    this.setSyncState('offline', 'Local Browser Cache');
+                    this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
                     return null;
                 }
 
                 if (cloudConfig.provider === 'supabase') {
+                    if (!cloudConfig.supabaseUrl || !cloudConfig.supabaseKey) {
+                        this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
+                        return null;
+                    }
                     const sb = getSupabaseClient();
                     if (!sb) {
-                        this.setSyncState('offline', 'Supabase Key Required');
+                        this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
                         return null;
                     }
                     try {
@@ -1899,15 +1914,19 @@ alter publication supabase_realtime add table cb_files;</div>
                         return { folders, files, lastUpdated: Date.now() };
                     } catch (err) {
                         console.warn("Supabase fetch error:", err);
-                        this.setSyncState('offline', 'Supabase Setup Required');
+                        this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
                         return null;
                     }
                 }
 
-                // Default Provider: Firebase Realtime Database
+                // Firebase Provider
                 try {
-                    this.setSyncState('syncing', 'Connecting to Cloud DB...');
                     const endpoint = this.getFirebaseEndpoint();
+                    if (!endpoint) {
+                        this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
+                        return null;
+                    }
+                    this.setSyncState('syncing', 'Connecting to Cloud DB...');
                     const res = await fetch(endpoint, { cache: 'no-store' });
                     if (!res.ok) throw new Error('HTTP ' + res.status);
                     const remote = await res.json();
@@ -1925,7 +1944,7 @@ alter publication supabase_realtime add table cb_files;</div>
                     };
                 } catch (err) {
                     console.warn("Cloud DB fetch error:", err);
-                    this.setSyncState('offline', 'Cloud Reconnecting...');
+                    this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
                     return null;
                 }
             },
