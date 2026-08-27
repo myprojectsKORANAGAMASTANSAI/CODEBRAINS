@@ -1878,18 +1878,18 @@ alter publication supabase_realtime add table cb_files;</div>
 
             async fetchAll() {
                 if (cloudConfig.provider === 'local') {
-                    this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
+                    this.setSyncState('offline', 'Local Storage (Offline Mode)');
                     return null;
                 }
 
                 if (cloudConfig.provider === 'supabase') {
                     if (!cloudConfig.supabaseUrl || !cloudConfig.supabaseKey) {
-                        this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
+                        this.setSyncState('offline', '⚠️ Setup Supabase URL (Click to connect)');
                         return null;
                     }
                     const sb = getSupabaseClient();
                     if (!sb) {
-                        this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
+                        this.setSyncState('offline', '⚠️ Setup Supabase URL (Click to connect)');
                         return null;
                     }
                     try {
@@ -1899,9 +1899,8 @@ alter publication supabase_realtime add table cb_files;</div>
                             sb.from('cb_files').select('*')
                         ]);
 
-                        if (resFolders.error || resFiles.error) {
-                            throw new Error(resFolders.error?.message || resFiles.error?.message);
-                        }
+                        if (resFolders.error) throw new Error(resFolders.error.message);
+                        if (resFiles.error) throw new Error(resFiles.error.message);
 
                         const folders = (resFolders.data || []).map(f => ({
                             id: f.id,
@@ -1921,11 +1920,14 @@ alter publication supabase_realtime add table cb_files;</div>
                             content: f.content
                         }));
 
-                        this.setSyncState('connected');
+                        this.setSyncState('connected', 'Supabase Connected (All Devices Synced)');
                         return { folders, files, lastUpdated: Date.now() };
                     } catch (err) {
                         console.warn("Supabase fetch error:", err);
-                        this.setSyncState('offline', 'Local Storage (Setup Cloud DB)');
+                        this.setSyncState('offline', 'Supabase Offline (Check tables/URL)');
+                        if (err.message && (err.message.includes('relation "public.cb_files" does not exist') || err.message.includes('42P01'))) {
+                            showToast("⚠️ Supabase tables missing. Click Cloud Settings and run the SQL Schema in Supabase SQL editor.", "error");
+                        }
                         return null;
                     }
                 }
@@ -1969,12 +1971,16 @@ alter publication supabase_realtime add table cb_files;</div>
 
                 if (cloudConfig.provider === 'supabase') {
                     const sb = getSupabaseClient();
-                    if (!sb) return false;
+                    if (!sb) {
+                        this.setSyncState('offline', '⚠️ Setup Supabase URL (Click to connect)');
+                        showToast("⚠️ Supabase Project URL is required. Click Cloud Settings (⚡) to configure it.", "error");
+                        return false;
+                    }
                     try {
                         this.setSyncState('syncing', 'Pushing to Supabase...');
                         const foldersPayload = dbObj.folders.map(f => ({
                             id: f.id,
-                            parent_id: f.parentId,
+                            parent_id: f.parentId || 'root',
                             name: f.name,
                             category: f.category || 'General',
                             date: f.date || new Date().toISOString().split('T')[0]
@@ -1982,7 +1988,7 @@ alter publication supabase_realtime add table cb_files;</div>
 
                         const filesPayload = dbObj.files.map(f => ({
                             id: f.id,
-                            folder_id: f.folderId,
+                            folder_id: f.folderId || 'root',
                             name: f.name,
                             type: f.type || 'code',
                             size: f.size || '1.0 KB',
@@ -1991,16 +1997,24 @@ alter publication supabase_realtime add table cb_files;</div>
                         }));
 
                         if (foldersPayload.length > 0) {
-                            await sb.from('cb_folders').upsert(foldersPayload);
+                            const { error: fErr } = await sb.from('cb_folders').upsert(foldersPayload);
+                            if (fErr) throw new Error(fErr.message);
                         }
                         if (filesPayload.length > 0) {
-                            await sb.from('cb_files').upsert(filesPayload);
+                            const { error: fileErr } = await sb.from('cb_files').upsert(filesPayload);
+                            if (fileErr) throw new Error(fileErr.message);
                         }
 
-                        this.setSyncState('connected', 'All Devices Synced');
+                        this.setSyncState('connected', 'Supabase Connected (All Devices Synced)');
                         return true;
                     } catch (e) {
                         console.warn("Push to Supabase failed:", e);
+                        this.setSyncState('offline', 'Supabase Error (Check SQL Schema)');
+                        if (e.message && (e.message.includes('relation "public.cb_files" does not exist') || e.message.includes('42P01'))) {
+                            showToast("⚠️ Supabase tables missing! Open Cloud Settings and run SQL Schema in Supabase SQL Editor.", "error");
+                        } else {
+                            showToast(`⚠️ Supabase save error: ${e.message}`, "error");
+                        }
                         return false;
                     }
                 }
@@ -2034,6 +2048,35 @@ alter publication supabase_realtime add table cb_files;</div>
             },
 
             async saveFolder(folder) {
+                if (cloudConfig.provider === 'supabase') {
+                    const sb = getSupabaseClient();
+                    if (!sb) {
+                        this.setSyncState('offline', '⚠️ Setup Supabase URL (Click to connect)');
+                        showToast("⚠️ Supabase Project URL missing. Add in Cloud Settings.", "error");
+                        return false;
+                    }
+                    try {
+                        const folderPayload = {
+                            id: folder.id,
+                            parent_id: folder.parentId || 'root',
+                            name: folder.name,
+                            category: folder.category || 'General',
+                            date: folder.date || new Date().toISOString().split('T')[0]
+                        };
+                        const { error } = await sb.from('cb_folders').upsert([folderPayload]);
+                        if (error) throw new Error(error.message);
+                        this.setSyncState('connected', 'Supabase Connected (All Devices Synced)');
+                        return true;
+                    } catch (e) {
+                        console.warn("Direct folder save to Supabase failed:", e);
+                        if (e.message && (e.message.includes('relation "public.cb_folders" does not exist') || e.message.includes('42P01'))) {
+                            showToast("⚠️ Supabase table 'cb_folders' missing! Run SQL Schema in Supabase SQL Editor.", "error");
+                        } else {
+                            showToast(`⚠️ Supabase save failed: ${e.message}`, "error");
+                        }
+                        return false;
+                    }
+                }
                 return await this.pushAll(db);
             },
 
@@ -2053,6 +2096,37 @@ alter publication supabase_realtime add table cb_files;</div>
             },
 
             async saveFile(file) {
+                if (cloudConfig.provider === 'supabase') {
+                    const sb = getSupabaseClient();
+                    if (!sb) {
+                        this.setSyncState('offline', '⚠️ Setup Supabase URL (Click to connect)');
+                        showToast("⚠️ Supabase Project URL missing. Add in Cloud Settings.", "error");
+                        return false;
+                    }
+                    try {
+                        const filePayload = {
+                            id: file.id,
+                            folder_id: file.folderId || 'root',
+                            name: file.name,
+                            type: file.type || 'code',
+                            size: file.size || '1.0 KB',
+                            date: file.date || new Date().toISOString().split('T')[0],
+                            content: file.content || ''
+                        };
+                        const { error } = await sb.from('cb_files').upsert([filePayload]);
+                        if (error) throw new Error(error.message);
+                        this.setSyncState('connected', 'Supabase Connected (All Devices Synced)');
+                        return true;
+                    } catch (e) {
+                        console.warn("Direct file save to Supabase failed:", e);
+                        if (e.message && (e.message.includes('relation "public.cb_files" does not exist') || e.message.includes('42P01'))) {
+                            showToast("⚠️ Supabase table 'cb_files' missing! Run SQL Schema in Supabase SQL Editor.", "error");
+                        } else {
+                            showToast(`⚠️ Supabase save failed: ${e.message}`, "error");
+                        }
+                        return false;
+                    }
+                }
                 return await this.pushAll(db);
             },
 
