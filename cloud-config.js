@@ -9,25 +9,22 @@
  */
 
 window.CODEBRAINS_GLOBAL_CONFIG = {
-    // Active Cloud Provider: 'firebase' | 'supabase' | 'custom'
-    activeProvider: 'firebase',
-
-    // ── FIREBASE REALTIME DATABASE (Recommended for Instant Live Sync) ──
-    firebase: {
-        // Shared Realtime Database endpoint for CODE BRAINS
-        databaseUrl: 'https://codebrains-cloud-db-default-rtdb.firebaseio.com/',
-        // Unique cluster / root path for your organization's projects
-        dbNamespace: 'codebrains_master_store_v2',
-        // Auto Realtime sync interval in seconds (if SSE is not supported)
-        syncIntervalSeconds: 8
-    },
+    // Active Cloud Provider: 'supabase' | 'firebase' | 'local'
+    activeProvider: 'supabase',
 
     // ── SUPABASE (PostgreSQL + Realtime) ──
     supabase: {
         url: '', // e.g. https://your-project.supabase.co
-        anonKey: '', // e.g. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        anonKey: 'sb_publishable_CBfCxHZJBKdon1YuQIVJpg_Tkgppa39',
         foldersTable: 'cb_folders',
         filesTable: 'cb_files'
+    },
+
+    // ── FIREBASE REALTIME DATABASE (Optional backup provider) ──
+    firebase: {
+        databaseUrl: 'https://codebrains-cloud-db-default-rtdb.firebaseio.com/',
+        dbNamespace: 'codebrains_master_store_v2',
+        syncIntervalSeconds: 8
     },
 
     // Global App Settings

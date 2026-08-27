@@ -1146,7 +1146,7 @@
                     <span class="db-cloud-badge" id="cloudStatusBadge" title="Click to view Cloud Database Connection Status">
                         <span id="cloudStatusDot">⚡</span> <span id="cloudStatusText">Connecting Cloud...</span>
                     </span>
-                    <span class="db-user-badge">👤 mastan (Admin)</span>
+                    <span class="db-user-badge" id="dbUserBadge">👤 admin (Admin)</span>
                     <button class="db-logout-btn" id="dbHeaderLogoutBtn">Logout</button>
                 </div>
             </div>
@@ -1646,7 +1646,8 @@ alter publication supabase_realtime add table cb_files;</div>
     <script>
         // ── Security Credentials ──
         const AUTH_CONFIG = {
-            validUser: 'mastan',
+            validUser: 'admin',
+            alternateUsers: ['mastan', 'admin'],
             validPass: 'Zero@124',
             sessionKey: 'cb_authenticated_user'
         };
@@ -1667,17 +1668,21 @@ alter publication supabase_realtime add table cb_files;</div>
 
         function checkAuth() {
             const savedSession = sessionStorage.getItem(AUTH_CONFIG.sessionKey) || localStorage.getItem(AUTH_CONFIG.sessionKey);
-            if (savedSession === AUTH_CONFIG.validUser) {
-                unlockDashboard();
+            if (savedSession && (savedSession.toLowerCase() === AUTH_CONFIG.validUser || AUTH_CONFIG.alternateUsers.includes(savedSession.toLowerCase()))) {
+                unlockDashboard(savedSession);
             } else {
                 lockDashboard();
             }
         }
 
-        function unlockDashboard() {
+        function unlockDashboard(username = 'admin') {
             authOverlay.style.display = 'none';
             dbMainSection.style.display = 'block';
             document.getElementById('navLogoutBtn').style.display = 'inline-block';
+            const userBadge = document.getElementById('dbUserBadge');
+            if (userBadge) {
+                userBadge.textContent = `👤 ${username} (Admin)`;
+            }
             initDatabaseAndSupabase();
         }
 
@@ -1693,12 +1698,12 @@ alter publication supabase_realtime add table cb_files;</div>
             const user = authUsername.value.trim();
             const pass = authPassword.value;
 
-            if (user === AUTH_CONFIG.validUser && pass === AUTH_CONFIG.validPass) {
+            if ((user.toLowerCase() === AUTH_CONFIG.validUser || AUTH_CONFIG.alternateUsers.includes(user.toLowerCase())) && pass === AUTH_CONFIG.validPass) {
                 authError.style.display = 'none';
                 sessionStorage.setItem(AUTH_CONFIG.sessionKey, user);
                 localStorage.setItem(AUTH_CONFIG.sessionKey, user);
-                unlockDashboard();
-                showToast("Welcome back, Administrator!", "success");
+                unlockDashboard(user);
+                showToast(`Welcome back, ${user}! (Admin)`, "success");
             } else {
                 authError.style.display = 'block';
                 authError.classList.remove('shake');
@@ -1738,26 +1743,26 @@ alter publication supabase_realtime add table cb_files;</div>
         
         // Load default config from window.CODEBRAINS_GLOBAL_CONFIG (from cloud-config.js)
         const globalDefault = window.CODEBRAINS_GLOBAL_CONFIG || {
-            activeProvider: 'firebase',
+            activeProvider: 'supabase',
+            supabase: {
+                url: '',
+                anonKey: 'sb_publishable_CBfCxHZJBKdon1YuQIVJpg_Tkgppa39',
+                foldersTable: 'cb_folders',
+                filesTable: 'cb_files'
+            },
             firebase: {
                 databaseUrl: 'https://codebrains-cloud-db-default-rtdb.firebaseio.com/',
                 dbNamespace: 'codebrains_master_store_v2',
                 syncIntervalSeconds: 8
-            },
-            supabase: {
-                url: '',
-                anonKey: '',
-                foldersTable: 'cb_folders',
-                filesTable: 'cb_files'
             }
         };
 
         let cloudConfig = {
-            provider: (globalDefault.activeProvider && globalDefault.activeProvider !== 'supabase') || (globalDefault.supabase && globalDefault.supabase.anonKey) ? globalDefault.activeProvider : 'local',
+            provider: (globalDefault.activeProvider) || 'supabase',
             firebaseUrl: (globalDefault.firebase && globalDefault.firebase.databaseUrl) || '',
             firebaseNamespace: (globalDefault.firebase && globalDefault.firebase.dbNamespace) || 'codebrains_master_store_v2',
             supabaseUrl: (globalDefault.supabase && globalDefault.supabase.url) || '',
-            supabaseKey: (globalDefault.supabase && globalDefault.supabase.anonKey) || ''
+            supabaseKey: (globalDefault.supabase && globalDefault.supabase.anonKey) || 'sb_publishable_CBfCxHZJBKdon1YuQIVJpg_Tkgppa39'
         };
 
         function loadCloudConfig() {
@@ -1774,9 +1779,15 @@ alter publication supabase_realtime add table cb_files;</div>
                 } catch (e) {}
             }
 
-            // If Supabase is selected but no key is provided, default gracefully to local mode
-            if (cloudConfig.provider === 'supabase' && (!cloudConfig.supabaseKey || !cloudConfig.supabaseUrl)) {
-                cloudConfig.provider = 'local';
+            // Sync with globalDefault if needed
+            if ((!cloudConfig.supabaseKey || cloudConfig.supabaseKey === '') && globalDefault.supabase && globalDefault.supabase.anonKey) {
+                cloudConfig.supabaseKey = globalDefault.supabase.anonKey;
+            }
+            if ((!cloudConfig.supabaseUrl || cloudConfig.supabaseUrl === '') && globalDefault.supabase && globalDefault.supabase.url) {
+                cloudConfig.supabaseUrl = globalDefault.supabase.url;
+            }
+            if (globalDefault.activeProvider) {
+                cloudConfig.provider = globalDefault.activeProvider;
             }
         }
 
