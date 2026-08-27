@@ -14,6 +14,11 @@
     <script src="cloud-config.js"></script>
     <!-- Official Supabase JS SDK v2 -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase Modular Services -->
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/storageService.js"></script>
+    <script src="js/folderService.js"></script>
+    <script src="js/fileService.js"></script>
     <style>
         .db-layout {
             padding: 90px 0 60px;
@@ -1393,30 +1398,39 @@ create table if not exists cb_folders (
     name text not null,
     category text default 'General',
     date text,
-    created_at timestamp with time zone default timezone('utc'::text, now())
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
--- 2. Create Files Table
+-- 2. Create Files Table (with Storage support)
 create table if not exists cb_files (
     id text primary key,
     folder_id text default 'root',
     name text not null,
     type text default 'code',
     size text,
+    storage_path text,
+    mime_type text,
+    url text,
     date text,
     content text,
-    created_at timestamp with time zone default timezone('utc'::text, now())
+    created_at timestamp with time zone default timezone('utc'::text, now()),
+    updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
--- 3. Enable Public Access & Realtime Policies
+-- 3. Enable RLS & Policies
 alter table cb_folders enable row level security;
 alter table cb_files enable row level security;
-
 create policy "Allow all on cb_folders" on cb_folders for all using (true) with check (true);
 create policy "Allow all on cb_files" on cb_files for all using (true) with check (true);
 
+-- 4. Enable Realtime Replication
 alter publication supabase_realtime add table cb_folders;
-alter publication supabase_realtime add table cb_files;</div>
+alter publication supabase_realtime add table cb_files;
+
+-- 5. Create Storage Bucket 'files'
+insert into storage.buckets (id, name, public) values ('files', 'files', true) on conflict (id) do nothing;
+create policy "Allow all on files bucket" on storage.objects for all using (bucket_id = 'files') with check (bucket_id = 'files');</div>
                     </div>
                 </div>
 
@@ -2653,11 +2667,21 @@ alter publication supabase_realtime add table cb_files;</div>
             document.getElementById('statFiles').textContent = db.files.length;
         }
 
-        // ── Delete Actions (Permanently removes from Universal Cloud DB) ──
+        // ── Delete Actions (Permanently removes from Supabase Cloud DB) ──
         window.deleteFolder = async function(id) {
             const folder = db.folders.find(f => f.id === id);
             const folderName = folder ? folder.name : 'this folder';
-            if (confirm(`Are you sure you want to PERMANENTLY delete folder "${folderName}" and all its contents from the Universal Cloud Database across all devices?`)) {
+            if (confirm(`Are you sure you want to PERMANENTLY delete folder "${folderName}" and all its contents from the Supabase Cloud Database across all devices?`)) {
+                if (cloudConfig.provider === 'supabase' && window.CodeBrainsFolderService && window.CodeBrainsSupabase?.getClient()) {
+                    try {
+                        await window.CodeBrainsFolderService.deleteFolder(id);
+                    } catch (e) {
+                        console.warn("[deleteFolder] Supabase service error:", e);
+                    }
+                } else {
+                    await UniversalCloudEngine.deleteFolder(id);
+                }
+
                 const toDelete = [id];
                 function collectChildren(pId) {
                     db.folders.filter(f => f.parentId === pId).forEach(child => {
@@ -2676,9 +2700,7 @@ alter publication supabase_realtime add table cb_files;</div>
 
                 persistLocally();
                 renderExplorer();
-
-                await UniversalCloudEngine.deleteFolder(id);
-                showToast(`Folder "${folderName}" deleted from Cloud DB across all devices`, "info");
+                showToast(`Folder "${folderName}" and its files deleted`, "info");
             }
         };
 
@@ -2691,13 +2713,21 @@ alter publication supabase_realtime add table cb_files;</div>
         window.deleteFile = async function(id) {
             const file = db.files.find(f => f.id === id);
             const fileName = file ? file.name : 'this file';
-            if (confirm(`PERMANENTLY delete file "${fileName}" from Universal Cloud Database across all devices?`)) {
+            if (confirm(`PERMANENTLY delete file "${fileName}" from Supabase Cloud Database across all devices?`)) {
+                if (cloudConfig.provider === 'supabase' && window.CodeBrainsFileService && window.CodeBrainsSupabase?.getClient()) {
+                    try {
+                        await window.CodeBrainsFileService.deleteFile(id, file.storagePath);
+                    } catch (e) {
+                        console.warn("[deleteFile] Supabase service error:", e);
+                    }
+                } else {
+                    await UniversalCloudEngine.deleteFile(id);
+                }
+
                 db.files = db.files.filter(f => f.id !== id);
                 persistLocally();
                 renderExplorer();
-
-                await UniversalCloudEngine.deleteFile(id);
-                showToast(`File "${fileName}" deleted from Cloud DB across all devices`, "info");
+                showToast(`File "${fileName}" deleted from Cloud DB`, "info");
             }
         };
 
@@ -2724,6 +2754,15 @@ alter publication supabase_realtime add table cb_files;</div>
                 if (folder) {
                     folder.name = newName;
                     targetItem = folder;
+                    if (cloudConfig.provider === 'supabase' && window.CodeBrainsFolderService && window.CodeBrainsSupabase?.getClient()) {
+                        try {
+                            await window.CodeBrainsFolderService.renameFolder(folder.id, newName);
+                        } catch (e) {
+                            await UniversalCloudEngine.saveFolder(targetItem);
+                        }
+                    } else {
+                        await UniversalCloudEngine.saveFolder(targetItem);
+                    }
                 }
             } else {
                 const file = db.files.find(f => f.id === itemToRename.id);
@@ -2732,20 +2771,22 @@ alter publication supabase_realtime add table cb_files;</div>
                     const { category } = getFileDetails(newName);
                     file.type = category;
                     targetItem = file;
+                    if (cloudConfig.provider === 'supabase' && window.CodeBrainsFileService && window.CodeBrainsSupabase?.getClient()) {
+                        try {
+                            await window.CodeBrainsFileService.renameFile(file.id, newName, category);
+                        } catch (e) {
+                            await UniversalCloudEngine.saveFile(targetItem);
+                        }
+                    } else {
+                        await UniversalCloudEngine.saveFile(targetItem);
+                    }
                 }
             }
 
             persistLocally();
             document.getElementById('renameModal').classList.remove('active');
             renderExplorer();
-
-            if (itemToRename.type === 'folder' && targetItem) {
-                await UniversalCloudEngine.saveFolder(targetItem);
-            } else if (targetItem) {
-                await UniversalCloudEngine.saveFile(targetItem);
-            }
-
-            showToast("Renamed & synced in Cloud DB across all devices", "success");
+            showToast("Renamed & synced in Supabase Cloud DB", "success");
         });
 
         // ── Move Item Actions ──
@@ -2768,13 +2809,21 @@ alter publication supabase_realtime add table cb_files;</div>
             const file = db.files.find(f => f.id === itemToMoveId);
             if (file) {
                 file.folderId = targetFolder;
+                if (cloudConfig.provider === 'supabase' && window.CodeBrainsFileService && window.CodeBrainsSupabase?.getClient()) {
+                    try {
+                        await window.CodeBrainsFileService.moveFile(file.id, targetFolder);
+                    } catch (e) {
+                        await UniversalCloudEngine.saveFile(file);
+                    }
+                } else {
+                    await UniversalCloudEngine.saveFile(file);
+                }
+
                 persistLocally();
                 document.getElementById('moveModal').classList.remove('active');
                 renderExplorer();
-
-                await UniversalCloudEngine.saveFile(file);
                 const destObj = db.folders.find(f => f.id === targetFolder);
-                showToast(`Moved "${file.name}" to ${destObj ? destObj.name : 'Root'} & synced in Cloud DB`, "success");
+                showToast(`Moved "${file.name}" to ${destObj ? destObj.name : 'Root'} & synced in Supabase`, "success");
             }
         });
 
@@ -2790,20 +2839,22 @@ alter publication supabase_realtime add table cb_files;</div>
             const container = document.getElementById('previewContainer');
             container.innerHTML = '';
 
-            const isImage = file.name.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i) || (file.content && file.content.startsWith('data:image/'));
+            const isImage = file.type === 'image' || file.name.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i) || (file.url && file.url.match(/\.(png|jpg|jpeg|gif|svg|webp)/i)) || (file.content && file.content.startsWith('data:image/'));
 
             if (isImage) {
                 const imgBox = document.createElement('div');
                 imgBox.className = 'image-preview-box';
                 const img = document.createElement('img');
-                img.src = file.content;
+                img.src = file.url || file.content;
                 img.alt = file.name;
+                img.style.maxHeight = '420px';
+                img.style.borderRadius = '8px';
                 imgBox.appendChild(img);
                 container.appendChild(imgBox);
             } else {
                 const codeBox = document.createElement('div');
                 codeBox.className = 'code-preview-box';
-                codeBox.textContent = file.content || `[Binary File: ${file.name}]\nSize: ${file.size}\nDate: ${file.date}\nClick "Download File" below to download.`;
+                codeBox.textContent = file.content || `[File: ${file.name}]\nSize: ${file.size}\nDate: ${file.date}\nDirect Storage URL: ${file.url || 'Available upon cloud connect'}\nClick "Download File" below to download.`;
                 container.appendChild(codeBox);
             }
 
@@ -2813,6 +2864,18 @@ alter publication supabase_realtime add table cb_files;</div>
         window.downloadFileById = function(id) {
             const file = db.files.find(f => f.id === id);
             if (!file) return;
+
+            if (file.url) {
+                const a = document.createElement('a');
+                a.href = file.url;
+                a.target = '_blank';
+                a.download = file.name;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                showToast(`Downloading "${file.name}"`, "info");
+                return;
+            }
 
             let blob;
             if (file.content && file.content.startsWith('data:')) {
@@ -2844,9 +2907,10 @@ alter publication supabase_realtime add table cb_files;</div>
 
         document.getElementById('btnCopyPreview').addEventListener('click', () => {
             if (!activePreviewFile) return;
-            if (activePreviewFile.content) {
-                navigator.clipboard.writeText(activePreviewFile.content).then(() => {
-                    showToast("Content copied to clipboard!", "success");
+            const textToCopy = activePreviewFile.content || activePreviewFile.url || '';
+            if (textToCopy) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast("Copied to clipboard!", "success");
                 });
             }
         });
@@ -2880,19 +2944,30 @@ alter publication supabase_realtime add table cb_files;</div>
 
             const newFolder = {
                 id: 'f_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
-                parentId: parentId,
+                parentId: parentId || 'root',
                 name: name,
                 category: category,
                 date: new Date().toISOString().split('T')[0]
             };
 
-            db.folders.push(newFolder);
+            if (cloudConfig.provider === 'supabase' && window.CodeBrainsFolderService && window.CodeBrainsSupabase?.getClient()) {
+                try {
+                    const saved = await window.CodeBrainsFolderService.createFolder(newFolder);
+                    db.folders.push(saved);
+                } catch (e) {
+                    console.warn("[btnConfirmFolder] Supabase service fallback:", e);
+                    db.folders.push(newFolder);
+                    await UniversalCloudEngine.saveFolder(newFolder);
+                }
+            } else {
+                db.folders.push(newFolder);
+                await UniversalCloudEngine.saveFolder(newFolder);
+            }
+
             persistLocally();
             document.getElementById('folderModal').classList.remove('active');
             renderExplorer();
-
-            await UniversalCloudEngine.saveFolder(newFolder);
-            showToast(`Folder "${name}" saved to Universal Cloud DB`, "success");
+            showToast(`Folder "${name}" saved to Supabase Cloud DB`, "success");
         });
 
         // ── Upload Files Modal Triggers ──
@@ -2979,7 +3054,7 @@ alter publication supabase_realtime add table cb_files;</div>
 
             const btn = document.getElementById('btnConfirmUpload');
             btn.disabled = true;
-            btn.textContent = 'Uploading to Cloud DB...';
+            btn.textContent = 'Uploading to Supabase...';
 
             for (const file of stagedFiles) {
                 await processAndSaveFile(file, targetFolder, categoryPreference);
@@ -2987,18 +3062,44 @@ alter publication supabase_realtime add table cb_files;</div>
 
             persistLocally();
             document.getElementById('uploadModal').classList.remove('active');
-            btn.textContent = 'Upload & Save in Cloud DB';
+            btn.textContent = 'Upload & Save in Supabase';
             stagedFiles = [];
             renderExplorer();
 
-            showToast(`Uploaded & synced to Universal Cloud DB`, "success");
+            showToast(`Uploaded & synced to Supabase Cloud DB`, "success");
         });
 
-        function processAndSaveFile(file, folderId, explicitCategory) {
+        async function processAndSaveFile(file, folderId, explicitCategory) {
+            const { category } = getFileDetails(file.name, explicitCategory);
+
+            let textPreview = '';
+            const isTextLike = file.name.match(/\.(py|ipynb|txt|csv|json|md|html|css|js|sql|sh|xml|yaml|yml)$/i);
+            if (isTextLike) {
+                try {
+                    textPreview = await file.text();
+                } catch (e) {}
+            }
+
+            if (cloudConfig.provider === 'supabase' && window.CodeBrainsFileService && window.CodeBrainsSupabase?.getClient()) {
+                try {
+                    const savedFile = await window.CodeBrainsFileService.uploadFile({
+                        fileObject: file,
+                        folderId: folderId,
+                        category: category,
+                        textContent: textPreview
+                    });
+                    db.files.unshift(savedFile);
+                    persistLocally();
+                    return savedFile;
+                } catch (err) {
+                    console.warn("[processAndSaveFile] Supabase direct upload error, fallback:", err);
+                }
+            }
+
+            // Fallback / Offline / Local mode
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = async function(e) {
-                    const { category } = getFileDetails(file.name, explicitCategory);
                     const newFile = {
                         id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
                         folderId: folderId,
@@ -3006,14 +3107,16 @@ alter publication supabase_realtime add table cb_files;</div>
                         type: category,
                         size: file.size > 1048576 ? (file.size / 1048576).toFixed(1) + ' MB' : (file.size / 1024).toFixed(1) + ' KB',
                         date: new Date().toISOString().split('T')[0],
-                        content: e.target.result
+                        content: e.target.result,
+                        url: ''
                     };
-                    db.files.push(newFile);
+                    db.files.unshift(newFile);
+                    persistLocally();
                     await UniversalCloudEngine.saveFile(newFile);
-                    resolve();
+                    resolve(newFile);
                 };
 
-                if (file.name.match(/\.(py|ipynb|txt|csv|json|md|html|css|js|sql|sh|xml|yaml|yml)$/i)) {
+                if (isTextLike) {
                     reader.readAsText(file);
                 } else {
                     reader.readAsDataURL(file);
@@ -3168,22 +3271,47 @@ if __name__ == "__main__":
             if (!name) return alert("Please enter a file name (e.g. model.py)");
 
             const { category } = getFileDetails(name, 'code');
-            const newFile = {
-                id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                folderId: targetFolder,
-                name: name,
-                type: category,
-                size: (content.length / 1024).toFixed(1) + ' KB',
-                date: new Date().toISOString().split('T')[0],
-                content: content
-            };
 
-            db.files.push(newFile);
+            if (cloudConfig.provider === 'supabase' && window.CodeBrainsFileService && window.CodeBrainsSupabase?.getClient()) {
+                try {
+                    const savedFile = await window.CodeBrainsFileService.createCodeFile({
+                        name: name,
+                        folderId: targetFolder,
+                        type: category,
+                        content: content
+                    });
+                    db.files.unshift(savedFile);
+                } catch (e) {
+                    console.warn("[btnConfirmCode] Code file upload fallback:", e);
+                    const newFile = {
+                        id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                        folderId: targetFolder,
+                        name: name,
+                        type: category,
+                        size: (content.length / 1024).toFixed(1) + ' KB',
+                        date: new Date().toISOString().split('T')[0],
+                        content: content
+                    };
+                    db.files.unshift(newFile);
+                    await UniversalCloudEngine.saveFile(newFile);
+                }
+            } else {
+                const newFile = {
+                    id: 'file_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                    folderId: targetFolder,
+                    name: name,
+                    type: category,
+                    size: (content.length / 1024).toFixed(1) + ' KB',
+                    date: new Date().toISOString().split('T')[0],
+                    content: content
+                };
+                db.files.unshift(newFile);
+                await UniversalCloudEngine.saveFile(newFile);
+            }
+
             persistLocally();
             document.getElementById('codeModal').classList.remove('active');
             renderExplorer();
-
-            await SupabaseEngine.saveFile(newFile);
             showToast(`Saved code file "${name}" in Supabase`, "success");
         });
 
@@ -3336,15 +3464,21 @@ window.CODEBRAINS_GLOBAL_CONFIG = {
 
                     if (error) {
                         if (error.message.includes('relation "public.cb_folders" does not exist') || error.code === '42P01') {
-                            statusEl.textContent = '⚠️ Connected to Supabase, but tables missing. Run the SQL schema above in SQL editor!';
+                            statusEl.textContent = '⚠️ Connected to Supabase, but tables missing. Run the SQL schema above in Supabase SQL editor!';
                             statusEl.style.color = '#fbbf24';
                         } else {
                             statusEl.textContent = '❌ Supabase Error: ' + error.message;
                             statusEl.style.color = '#f87171';
                         }
                     } else {
-                        statusEl.textContent = '⚡ Connected successfully! Supabase PostgreSQL tables are ready.';
-                        statusEl.style.color = '#3ecf8e';
+                        const { data: bucketData, error: bErr } = await client.storage.getBucket('files');
+                        if (bErr) {
+                            statusEl.textContent = '⚡ PostgreSQL connected! Note: Storage bucket "files" not created yet. Run the SQL schema above in SQL editor.';
+                            statusEl.style.color = '#fbbf24';
+                        } else {
+                            statusEl.textContent = '⚡ Connected successfully! Supabase PostgreSQL tables and Storage bucket "files" are ready.';
+                            statusEl.style.color = '#3ecf8e';
+                        }
                     }
                 } catch (err) {
                     statusEl.textContent = '❌ Connection failed: ' + err.message;
